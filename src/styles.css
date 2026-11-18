@@ -231,3 +231,10 @@ html.dark dialog.modal::backdrop { background: rgb(0 0 0 / 0.6); }
 html.dark ::selection { background: #2b4479; }
 html.dark img.mpl-img { filter: brightness(0.92); }
 html.theme-anim, html.theme-anim *, html.theme-anim *::before { transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease !important; }
+
+/* Menú de descargas */
+@layer components {
+  .menu-item { @apply flex items-center gap-3 rounded-md px-2.5 py-2 text-sm hover:bg-slate-50 focus-visible:bg-slate-50; }
+  .menu-badge { @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-[10px] font-bold text-white; }
+}
+details[data-menu][open] > summary { background: var(--color-slate-50); }

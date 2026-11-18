@@ -3,6 +3,7 @@ import simulacionUrl from '../../python/simulacion.py?url';
 import graficoUrl from '../../python/grafico.py?url';
 import requirementsUrl from '../../python/requirements.txt?url';
 import notebookUrl from '../../python/OptiQueue.ipynb?url';
+import csvUrl from '../../python/salidas/resultados_mmc.csv?url';
 
 const SECTIONS = [
   ['#respuestas', 'Respuestas'],
@@ -22,6 +23,7 @@ const FILES = [
   [graficoUrl, 'grafico.py', 'Matplotlib'],
   [requirementsUrl, 'requirements.txt', 'Dependencias'],
   [notebookUrl, 'OptiQueue.ipynb', 'Jupyter'],
+  [csvUrl, 'resultados_mmc.csv', 'Datos'],
 ];
 
 const METHODS = [
@@ -69,7 +71,9 @@ export function renderFooter(el, opt) {
           `<ul class="space-y-2 text-sm">
             <li><button type="button" class="text-left text-slate-600 hover:text-ink cursor-pointer" data-open="dlgEnunciado">Enunciado del ejercicio</button></li>
             <li><button type="button" class="text-left text-slate-600 hover:text-ink cursor-pointer" data-action="open-opt">Resolución paso a paso</button></li>
-            <li><a href="./informe.html" class="text-slate-600 hover:text-ink">Informe para imprimir (PDF)</a></li>
+            <li><a href="./descargas/OptiQueue_Informe_Final.docx" download class="text-slate-600 hover:text-ink">Informe final (Word)</a></li>
+            <li><a href="./descargas/OptiQueue_Informe_Final.pdf" download class="text-slate-600 hover:text-ink">Informe final (PDF)</a></li>
+            <li><a href="./informe.html" class="text-slate-600 hover:text-ink">Resumen imprimible</a></li>
           </ul>
           <p class="mt-5 text-xs text-slate-500">Descargar código</p>
           <ul class="mt-2 space-y-1.5 text-sm">

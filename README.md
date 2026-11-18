@@ -3,7 +3,7 @@
 [![CI](https://github.com/Urafael-Dev/optiqueue/actions/workflows/ci.yml/badge.svg)](https://github.com/Urafael-Dev/optiqueue/actions/workflows/ci.yml)
 [![Abrir en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Urafael-Dev/optiqueue/blob/main/python/OptiQueue.ipynb)
 
-**Web:** https://optiqueue-roan.vercel.app · **Informe PDF:** https://optiqueue-roan.vercel.app/informe.html
+**Web:** https://optiqueue-roan.vercel.app · **Informe final:** [Word](https://optiqueue-roan.vercel.app/descargas/OptiQueue_Informe_Final.docx) · [PDF](https://optiqueue-roan.vercel.app/descargas/OptiQueue_Informe_Final.pdf) · **Resumen imprimible:** https://optiqueue-roan.vercel.app/informe.html
 
 Proyecto final de Investigación de Operaciones (Ejercicio 4). ¿Cuántas ventanillas de migración conviene abrir en hora pico
 para minimizar el costo total sin que la espera promedio supere 6 minutos?
@@ -30,7 +30,7 @@ Datos: λ = 180 pas/h, μ = 15 pas/h por ventanilla, C<sub>s</sub> = $50/h, C<su
 - **Demanda por hora del día:** perfil de 24 h resuelto hora a hora (método SIPP). Ahorra unos $5.469/día (−30 %) frente a 15 ventanillas fijas.
 - **Gemelo digital:** sala de migración animada en tiempo real que compara el modelo con lo que ocurre en vivo.
 - **Simulación de eventos discretos:** réplicas con semilla e intervalos de confianza.
-- **Informe imprimible** (A4 / PDF) y **notebook de Jupyter** con todo el desarrollo y sus salidas.
+- **Informe final** descargable en Word y PDF (menú «Informe» de la barra superior), **resumen imprimible** generado con los cálculos y **notebook de Jupyter** con todo el desarrollo y sus salidas.
 - Modo oscuro, diseño adaptable a móvil y accesible con teclado.
 
 | Sensibilidad | Demanda por hora |
@@ -82,7 +82,8 @@ src/lib/simulation.js      Simulación de eventos discretos con réplicas
 src/lib/liveSim.js         Motor en tiempo real del gemelo digital
 src/lib/formulas.js        Fórmulas LaTeX y su renderizado con KaTeX
 src/sections/*.js          Secciones de la interfaz
-python/                    Código Python, notebook y salidas reales
+python/                    Código Python, notebook, salidas reales y resultados_mmc.csv
+public/descargas/          Informe final del proyecto (Word y PDF)
 tests/                     Pruebas (Vitest)
 .github/workflows/ci.yml   Tests, build y ejecución del código Python en cada cambio
 legacy/                    HTML original, conservado como referencia

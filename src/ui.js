@@ -1,10 +1,10 @@
 import {
   createIcons, ArrowRight, ArrowUp, ChartLine, ChevronRight, CircleCheck, Code, Copy, Cpu, Download, FileText, LayoutDashboard, Menu, Pause, Play, RotateCcw, Sigma, ArrowLeft, Check,
-  SlidersHorizontal, Table, X, Split, Clock, Moon, Sun, Printer, BookOpen, ExternalLink,
+  SlidersHorizontal, Table, X, Split, Clock, Moon, Sun, Printer, BookOpen, ExternalLink, FileDown, ChevronDown,
 } from 'lucide';
 
 const ICONS = {
-  ArrowLeft, ArrowRight, ArrowUp, ChartLine, Check, ChevronRight, CircleCheck, Code, Copy, Cpu, Download, FileText, LayoutDashboard, Menu, Pause, Play, RotateCcw, Sigma, SlidersHorizontal, Table, X, Split, Clock, Moon, Sun, Printer, BookOpen, ExternalLink,
+  ArrowLeft, ArrowRight, ArrowUp, ChartLine, Check, ChevronRight, CircleCheck, Code, Copy, Cpu, Download, FileText, LayoutDashboard, Menu, Pause, Play, RotateCcw, Sigma, SlidersHorizontal, Table, X, Split, Clock, Moon, Sun, Printer, BookOpen, ExternalLink, FileDown, ChevronDown,
 };
 
 /** Reemplaza los <i data-lucide> pendientes por SVG. Llamar tras cada render. */
@@ -133,4 +133,23 @@ export function setupTheme() {
     if (!saved) apply(e.matches, false);
   });
   sync();
+}
+
+/** Menús desplegables (<details data-menu>): se cierran al hacer clic fuera, al elegir una opción o con Escape. */
+export function setupMenus() {
+  const menus = [...document.querySelectorAll('details[data-menu]')];
+  document.addEventListener('click', (e) => {
+    menus.forEach((m) => {
+      if (m.open && (!m.contains(e.target) || e.target.closest('[role="menuitem"]'))) m.open = false;
+    });
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    menus.forEach((m) => {
+      if (m.open) {
+        m.open = false;
+        m.querySelector('summary').focus();
+      }
+    });
+  });
 }

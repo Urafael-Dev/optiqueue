@@ -1,7 +1,7 @@
 import './styles.css';
 import { PARAMS as P } from './config.js';
 import { optimize, savings } from './lib/queue.js';
-import { createStore, refreshIcons, setupDialogs, setupScrollSpy, setupSidebar, setupTheme } from './ui.js';
+import { createStore, refreshIcons, setupDialogs, setupScrollSpy, setupMenus, setupSidebar, setupTheme } from './ui.js';
 import { renderAnswers, renderIntro, renderParamsCard, renderTopSavings } from './sections/overview.js';
 import { renderChart } from './sections/chart.js';
 import { renderScenarios } from './sections/scenarios.js';
@@ -60,6 +60,7 @@ document.addEventListener('click', (e) => {
 setupDialogs();
 setupSidebar();
 setupTheme();
+setupMenus();
 setupScrollSpy();
 refreshIcons();
 

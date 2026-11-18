@@ -189,7 +189,22 @@
         </nav>
         <div class="ml-auto flex items-center gap-2 sm:gap-3">
           <span id="topSavings" class="hidden md:inline text-sm text-slate-500"></span>
-          <a href="./informe.html" class="btn" title="Informe imprimible / PDF"><i data-lucide="printer"></i><span class="hidden sm:inline">Informe PDF</span></a>
+          <details class="relative" data-menu>
+            <summary class="btn list-none [&::-webkit-details-marker]:hidden" title="Descargar el informe"><i data-lucide="file-down"></i><span class="hidden sm:inline">Informe</span><i data-lucide="chevron-down" class="hidden sm:block !w-3.5 !h-3.5 text-slate-400"></i></summary>
+            <div class="absolute right-0 top-full mt-2 w-72 max-sm:fixed max-sm:inset-x-4 max-sm:top-16 max-sm:w-auto rounded-lg border border-line bg-surface p-1.5 shadow-lg z-30" role="menu">
+              <p class="px-2.5 pt-1.5 pb-1 text-xs text-slate-500">Informe final del proyecto</p>
+              <a href="./descargas/OptiQueue_Informe_Final.docx" download class="menu-item" role="menuitem">
+                <span class="menu-badge bg-[#2b579a]">W</span><span><span class="block font-medium text-ink">Word (.docx)</span><span class="block text-xs text-slate-500">Editable · 44 páginas · 1,7 MB</span></span>
+              </a>
+              <a href="./descargas/OptiQueue_Informe_Final.pdf" download class="menu-item" role="menuitem">
+                <span class="menu-badge bg-[#c02626]">PDF</span><span><span class="block font-medium text-ink">PDF</span><span class="block text-xs text-slate-500">Para entregar o imprimir · 2,3 MB</span></span>
+              </a>
+              <div class="my-1 border-t border-line"></div>
+              <a href="./informe.html" class="menu-item" role="menuitem">
+                <span class="menu-badge bg-slate-500"><i data-lucide="printer" class="!w-3.5 !h-3.5"></i></span><span><span class="block font-medium text-ink">Resumen imprimible</span><span class="block text-xs text-slate-500">Versión web generada con los cálculos</span></span>
+              </a>
+            </div>
+          </details>
           <button id="themeToggle" type="button" class="btn w-9 px-0" aria-label="Activar modo oscuro" title="Cambiar tema"><i data-lucide="moon"></i></button>
           <button type="button" class="btn" data-open="dlgEnunciado"><i data-lucide="file-text"></i><span class="hidden sm:inline">Enunciado</span></button>
         </div>
