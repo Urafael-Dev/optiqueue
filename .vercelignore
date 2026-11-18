@@ -1,0 +1,8 @@
+node_modules
+dist
+legacy
+tests
+.vercel
+__pycache__
+.venv
+.env*

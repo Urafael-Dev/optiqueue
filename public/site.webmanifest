@@ -1,0 +1,15 @@
+{
+  "name": "OptiQueue · Colas en migración aeroportuaria",
+  "short_name": "OptiQueue",
+  "description": "Optimización de colas M/M/c en el control migratorio: Erlang C, simulación y programación entera.",
+  "lang": "es",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f3f5f8",
+  "theme_color": "#0f1b2d",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

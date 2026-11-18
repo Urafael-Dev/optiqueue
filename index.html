@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Colas M/M/c en migración aeroportuaria · OptiQueue</title>
+    <meta name="description" content="Cuántas ventanillas de migración abrir en hora pico: modelo M/M/c (Erlang C), simulación con SimPy y programación entera con PuLP. Óptimo: 15 ventanillas." />
+    <meta name="keywords" content="teoría de colas, M/M/c, Erlang C, investigación de operaciones, simulación de eventos discretos, SimPy, PuLP, programación entera, migración aeroportuaria, optimización" />
+    <meta name="author" content="OptiQueue" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://optiqueue-roan.vercel.app/" />
+
+    <!-- Apariencia e iconos -->
+    <meta name="theme-color" content="#0f1b2d" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Open Graph (WhatsApp, Facebook, LinkedIn…) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:site_name" content="OptiQueue" />
+    <meta property="og:url" content="https://optiqueue-roan.vercel.app/" />
+    <meta property="og:title" content="Optimización de colas en el control migratorio · OptiQueue" />
+    <meta property="og:description" content="Modelo M/M/c, simulación de eventos discretos y programación entera: 15 ventanillas minimizan el costo ($801,07/h) con 25,5 s de espera promedio." />
+    <meta property="og:image" content="https://optiqueue-roan.vercel.app/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="OptiQueue: 15 ventanillas óptimas, costo de $801,07 por hora, espera de 25,5 segundos y ahorro anual de $1,86 millones." />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Optimización de colas en el control migratorio · OptiQueue" />
+    <meta name="twitter:description" content="Modelo M/M/c, simulación con SimPy y programación entera con PuLP: el óptimo son 15 ventanillas." />
+    <meta name="twitter:image" content="https://optiqueue-roan.vercel.app/og-image.png" />
+    <meta name="twitter:image:alt" content="Resumen de resultados de OptiQueue con la curva de costo y el óptimo en 15 ventanillas." />
+
+    <!-- Datos estructurados -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://optiqueue-roan.vercel.app/#website",
+            "url": "https://optiqueue-roan.vercel.app/",
+            "name": "OptiQueue",
+            "inLanguage": "es"
+          },
+          {
+            "@type": "LearningResource",
+            "@id": "https://optiqueue-roan.vercel.app/#recurso",
+            "url": "https://optiqueue-roan.vercel.app/",
+            "name": "Optimización de colas en el servicio de migración aeroportuaria",
+            "description": "Resolución del Ejercicio 4 de Investigación de Operaciones: número óptimo de ventanillas con un modelo M/M/c, simulación de eventos discretos (SimPy) y programación entera (PuLP).",
+            "inLanguage": "es",
+            "learningResourceType": ["Ejercicio resuelto", "Simulación interactiva"],
+            "educationalLevel": "Universitario",
+            "teaches": ["Teoría de colas M/M/c", "Fórmula de Erlang C", "Simulación de eventos discretos", "Programación entera"],
+            "keywords": "teoría de colas, M/M/c, Erlang C, SimPy, PuLP, investigación de operaciones",
+            "image": "https://optiqueue-roan.vercel.app/og-image.png",
+            "isPartOf": { "@id": "https://optiqueue-roan.vercel.app/#website" },
+            "isAccessibleForFree": true
+          }
+        ]
+      }
+    </script>
+    <!-- Pantalla de carga (inline para que aparezca antes que el JS) -->
+    <style>
+      .splash-lock, .splash-lock body { overflow: hidden; }
+      #splash { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: #0f1b2d; color: #fff;
+        font-family: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif; transition: opacity .45s ease, visibility .45s; }
+      #splash.is-done { opacity: 0; visibility: hidden; }
+      #splash .sp-box { display: flex; flex-direction: column; align-items: center; gap: 1.1rem; padding: 0 1.5rem; text-align: center; }
+      #splash .sp-logo { display: flex; align-items: flex-end; gap: 5px; height: 44px; }
+      #splash .sp-logo span { width: 9px; border-radius: 3px; background: #2f5bd3; animation: sp-bar 1.1s ease-in-out infinite; }
+      #splash .sp-logo span:nth-child(1) { height: 40%; }
+      #splash .sp-logo span:nth-child(2) { height: 70%; animation-delay: .12s; }
+      #splash .sp-logo span:nth-child(3) { height: 100%; animation-delay: .24s; }
+      #splash .sp-logo span:nth-child(4) { height: 55%; background: transparent; border: 2px solid #8fb0ff; animation-delay: .36s; }
+      #splash .sp-name { font-size: 1.35rem; font-weight: 600; letter-spacing: .02em; }
+      #splash .sp-sub { margin-top: .2rem; font-size: .85rem; color: #94a3b8; }
+      #splash .sp-track { width: 11rem; height: 3px; border-radius: 3px; background: rgba(255,255,255,.1); overflow: hidden; }
+      #splash .sp-track span { display: block; width: 40%; height: 100%; border-radius: 3px; background: #8fb0ff; animation: sp-load 1.2s ease-in-out infinite; }
+      @keyframes sp-bar { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(.6); } }
+      @keyframes sp-load { 0% { transform: translateX(-100%); } 100% { transform: translateX(275%); } }
+      #splash .sp-logo span { transform-origin: bottom; }
+      @media (prefers-reduced-motion: reduce) { #splash .sp-logo span, #splash .sp-track span { animation: none; } #splash { transition: none; } }
+    </style>
+    <script>
+      document.documentElement.classList.add('splash-lock');
+      window.__splashStart = performance.now();
+      // Respaldo: si algo falla al cargar, la pantalla de carga no se queda fija.
+      setTimeout(function () {
+        var s = document.getElementById('splash');
+        if (s) { s.classList.add('is-done'); document.documentElement.classList.remove('splash-lock'); }
+      }, 8000);
+    </script>
+    <noscript><style>#splash { display: none !important; } .splash-lock, .splash-lock body { overflow: auto; }</style></noscript>
+  </head>
+  <body>
+    <div id="splash" role="status" aria-live="polite">
+      <div class="sp-box">
+        <div class="sp-logo" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <div>
+          <div class="sp-name">OptiQueue</div>
+          <div class="sp-sub">Calculando el modelo M/M/c…</div>
+        </div>
+        <div class="sp-track" aria-hidden="true"><span></span></div>
+      </div>
+    </div>
+    <a href="#contenido" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:bg-white focus:px-3 focus:py-2 focus:rounded-md focus:border focus:border-line">Saltar al contenido</a>
+
+    <noscript>
+      <div style="max-width: 46rem; margin: 2rem auto; padding: 1.5rem; font-family: system-ui, sans-serif; line-height: 1.6; background: #fff; border: 1px solid #e3e8ef; border-radius: 12px">
+        <h1>Optimización de colas en el control migratorio del aeropuerto</h1>
+        <p>Llegan 180 pasajeros por hora y cada ventanilla atiende 15 por hora. Abrir una ventanilla cuesta $50/h y cada pasajero en cola, $40/h; la espera promedio no puede superar 6 minutos.</p>
+        <h2>Respuestas</h2>
+        <ol>
+          <li><strong>Número óptimo de ventanillas: 15</strong>, con un costo total de $801,07/h, utilización del 80 % y espera promedio de 0,426 min (25,5 s).</li>
+          <li><strong>Frente a las 16 ventanillas fijas</strong> (costo reportado de $1.120/h) se ahorran $318,93/h (−28,5 %), unos $1,86 millones al año, y la espera solo aumenta 13,3 s.</li>
+        </ol>
+        <p>Método: modelo M/M/c (Erlang C), simulación de eventos discretos con SimPy y programación entera con PuLP. Activa JavaScript para ver los gráficos, el gemelo digital y la simulación interactiva.</p>
+      </div>
+    </noscript>
+
+    <div id="navOverlay" class="fixed inset-0 z-30 bg-navy/40 hidden lg:hidden"></div>
+
+    <!-- BARRA LATERAL -->
+    <aside id="sidebar" aria-label="Navegación principal"
+      class="fixed inset-y-0 left-0 z-40 w-64 bg-navy text-slate-400 flex flex-col -translate-x-full lg:translate-x-0 transition-transform duration-200">
+      <div class="h-16 px-5 flex items-center justify-between border-b border-white/[0.07]">
+        <a href="#inicio" class="flex items-center gap-2.5">
+          <img src="/favicon.svg" alt="" width="28" height="28" class="rounded-md" />
+          <span class="leading-tight">
+            <span class="block font-semibold text-white tracking-wide">OptiQueue</span>
+            <span class="block text-[11px] text-slate-500">Investigación de Operaciones</span>
+          </span>
+        </a>
+        <button id="navClose" type="button" class="lg:hidden p-1.5 -mr-1.5 rounded-md text-slate-400 hover:text-white hover:bg-white/5 cursor-pointer" aria-label="Cerrar menú">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <nav class="flex-1 overflow-y-auto px-3 py-5 space-y-6">
+        <div>
+          <p class="nav-group">Vista general</p>
+          <a href="#inicio" class="nav-link" data-spy><i data-lucide="layout-dashboard"></i>Resumen</a>
+          <a href="#respuestas" class="nav-link" data-spy><i data-lucide="circle-check"></i>Respuestas</a>
+        </div>
+        <div>
+          <p class="nav-group">Análisis M/M/c</p>
+          <a href="#grafico" class="nav-link" data-spy><i data-lucide="chart-line"></i>Costo vs. espera</a>
+          <a href="#escenarios" class="nav-link" data-spy><i data-lucide="table"></i>Escenarios</a>
+        </div>
+        <div>
+          <p class="nav-group">Simulación y modelo</p>
+          <a href="#gemelo" class="nav-link" data-spy><i data-lucide="sliders-horizontal"></i>Gemelo digital</a>
+          <a href="#simulacion" class="nav-link" data-spy><i data-lucide="cpu"></i>Simulación</a>
+          <a href="#formulacion" class="nav-link" data-spy><i data-lucide="sigma"></i>Modelo matemático</a>
+          <a href="#codigo" class="nav-link" data-spy><i data-lucide="code"></i>Código Python</a>
+        </div>
+      </nav>
+
+      <div id="paramsCard" class="m-3 overflow-hidden rounded-lg border border-white/[0.08] bg-white/[0.03]"></div>
+    </aside>
+
+    <div class="lg:pl-64 min-h-screen flex flex-col">
+      <!-- BARRA SUPERIOR -->
+      <header class="sticky top-0 z-20 h-16 bg-white border-b border-line flex items-center gap-3 px-4 sm:px-8">
+        <button id="navOpen" type="button" class="lg:hidden p-1.5 -ml-1.5 rounded-md text-slate-600 hover:bg-slate-100 cursor-pointer" aria-label="Abrir menú" aria-controls="sidebar" aria-expanded="false">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+        <nav aria-label="Ruta" class="min-w-0 flex items-center gap-2 text-sm">
+          <span class="hidden sm:inline text-slate-500">Proyecto final</span>
+          <i data-lucide="chevron-right" class="hidden sm:inline w-3.5 h-3.5 text-slate-300"></i>
+          <span class="font-medium text-ink truncate">Ejercicio 4 · Migración aeroportuaria</span>
+        </nav>
+        <div class="ml-auto flex items-center gap-4">
+          <span id="topSavings" class="hidden md:inline text-sm text-slate-500"></span>
+          <button type="button" class="btn" data-open="dlgEnunciado"><i data-lucide="file-text"></i><span class="hidden sm:inline">Enunciado</span></button>
+        </div>
+      </header>
+
+      <main id="contenido" class="flex-1 px-4 sm:px-8 py-8">
+        <div class="max-w-6xl mx-auto space-y-12">
+          <section id="inicio" aria-labelledby="titulo-principal"></section>
+          <section id="respuestas" class="sec" aria-labelledby="h-respuestas"></section>
+          <section id="grafico" class="sec" aria-labelledby="h-grafico"></section>
+          <section id="escenarios" class="sec" aria-labelledby="h-escenarios"></section>
+          <section id="gemelo" class="sec" aria-labelledby="h-gemelo"></section>
+          <section id="simulacion" class="sec" aria-labelledby="h-simulacion"></section>
+          <section id="formulacion" class="sec" aria-labelledby="h-formulacion"></section>
+          <section id="codigo" class="sec" aria-labelledby="h-codigo"></section>
+        </div>
+      </main>
+
+      <footer id="pie" class="mt-8 border-t border-line bg-white"></footer>
+    </div>
+
+    <dialog id="dlgEnunciado" class="modal max-w-3xl" aria-labelledby="dlgEnunciadoTitle">
+      <div class="flex items-start justify-between gap-4 px-4 sm:px-6 pt-5 pb-4 border-b border-line">
+        <div>
+          <p class="label">Guía de proyectos finales · Ejercicio 4</p>
+          <h2 id="dlgEnunciadoTitle" class="text-lg font-semibold">Optimización de colas en el servicio de migración</h2>
+          <p class="text-sm text-slate-500">Técnica: teoría de colas y simulación de eventos discretos</p>
+        </div>
+        <button type="button" class="btn border-0 px-2" data-close aria-label="Cerrar"><i data-lucide="x"></i></button>
+      </div>
+      <div id="enunciadoBody"></div>
+    </dialog>
+
+    <dialog id="dlgOpt" class="modal max-w-4xl" aria-labelledby="dlgOptTitle">
+      <div class="flex items-start justify-between gap-4 px-6 pt-5 pb-4 border-b border-line">
+        <div>
+          <p class="label">Resolución paso a paso</p>
+          <h2 id="dlgOptTitle" class="text-lg font-semibold">¿Cómo se llega a 15 ventanillas?</h2>
+        </div>
+        <button type="button" class="btn border-0 px-2" data-close aria-label="Cerrar"><i data-lucide="x"></i></button>
+      </div>
+      <div id="optBody"></div>
+    </dialog>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
