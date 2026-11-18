@@ -90,3 +90,5 @@ legacy/                    HTML original, conservado como referencia
 ```
 
 Despliegue: Vercel (`vercel deploy --prod`).
+
+Vídeo de portada: [«Looking at the clouds from a plane window»](https://mixkit.co/free-stock-video/looking-at-the-clouds-from-a-plane-window-2684/), Mixkit (Mixkit Stock Video Free License).

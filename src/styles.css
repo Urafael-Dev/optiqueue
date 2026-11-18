@@ -238,3 +238,9 @@ html.theme-anim, html.theme-anim *, html.theme-anim *::before { transition: back
   .menu-badge { @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-[10px] font-bold text-white; }
 }
 details[data-menu][open] > summary { background: var(--color-slate-50); }
+
+/* Vídeo de portada */
+@layer components {
+  .hero-video-btn { @apply absolute right-3 bottom-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition hover:bg-black/55 cursor-pointer; }
+  .hero-video-btn svg { @apply w-3.5 h-3.5; }
+}

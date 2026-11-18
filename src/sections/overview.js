@@ -1,5 +1,8 @@
-import hero600 from '../assets/hero-600.webp';
-import hero900 from '../assets/hero-900.webp';
+import heroVideo960 from '../assets/hero-960.mp4';
+import heroVideo640 from '../assets/hero-640.mp4';
+import heroPoster960 from '../assets/hero-poster-960.webp';
+import heroPoster640 from '../assets/hero-poster-640.webp';
+import { refreshIcons } from '../ui.js';
 import { minutes, num, pct, seconds, usd, usdCompact } from '../lib/format.js';
 import { sectionHead, sub } from './common.js';
 
@@ -85,9 +88,15 @@ export function renderIntro(el, P, opt, sv) {
           ${params.map(([k, v]) => `<div class="kv"><dt>${k}</dt><dd>${v}</dd></div>`).join('')}
         </dl>
       </div>
-      <div class="hidden lg:block lg:col-span-5 relative bg-slate-200">
-        <img src="${hero900}" srcset="${hero600} 600w, ${hero900} 900w" sizes="(min-width: 1024px) 440px, 0px"
-             width="900" height="598" alt="" decoding="async" fetchpriority="low" class="absolute inset-0 w-full h-full object-cover" />
+      <div class="order-first lg:order-none lg:col-span-5 relative aspect-video sm:aspect-[21/9] lg:aspect-auto bg-slate-200 overflow-hidden">
+        <video class="absolute inset-0 w-full h-full object-cover object-[70%_center]" muted loop playsinline preload="metadata"
+               poster="${heroPoster960}" aria-hidden="true" tabindex="-1" disablepictureinpicture data-hero-video>
+          <source src="${heroVideo640}" type="video/mp4" media="(max-width: 767px)" />
+          <source src="${heroVideo960}" type="video/mp4" />
+        </video>
+        <button type="button" class="hero-video-btn" data-hero-toggle aria-label="Pausar el vídeo de fondo" hidden>
+          <i data-lucide="pause"></i>
+        </button>
       </div>
     </div>
 
@@ -103,6 +112,50 @@ export function renderIntro(el, P, opt, sv) {
         )
         .join('')}
     </dl>`;
+
+  setupHeroVideo(el);
+}
+
+/**
+ * Vídeo decorativo de la portada: solo se reproduce si el usuario no pidió
+ * reducir el movimiento ni ahorrar datos, se pausa fuera de pantalla y tiene
+ * un botón para detenerlo (contenido en movimiento de más de 5 s).
+ */
+function setupHeroVideo(el) {
+  const video = el.querySelector('[data-hero-video]');
+  const btn = el.querySelector('[data-hero-toggle]');
+  if (!video) return;
+  if (window.matchMedia('(max-width: 767px)').matches) video.poster = heroPoster640;
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const saveData = navigator.connection?.saveData === true;
+  if (reduceMotion || saveData) {
+    video.preload = 'none'; // se queda el póster (un fotograma del vídeo)
+    return;
+  }
+
+  let userPaused = false;
+  let visible = false;
+  const sync = () => {
+    const shouldPlay = visible && !userPaused && !document.hidden;
+    if (shouldPlay && video.paused) video.play().catch(() => {});
+    else if (!shouldPlay && !video.paused) video.pause();
+    const playing = !userPaused;
+    btn.setAttribute('aria-label', playing ? 'Pausar el vídeo de fondo' : 'Reproducir el vídeo de fondo');
+    btn.setAttribute('aria-pressed', String(!playing));
+    btn.innerHTML = `<i data-lucide="${playing ? 'pause' : 'play'}"></i>`;
+    refreshIcons();
+  };
+  btn.hidden = false;
+  btn.addEventListener('click', () => {
+    userPaused = !userPaused;
+    sync();
+  });
+  new IntersectionObserver(([e]) => {
+    visible = e.isIntersecting;
+    sync();
+  }).observe(video);
+  document.addEventListener('visibilitychange', sync);
 }
 
 export function renderAnswers(el, P, opt, sv) {
