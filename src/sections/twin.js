@@ -30,7 +30,7 @@ export function renderTwin(el, P, opt, store) {
 
   el.innerHTML = `
     ${sectionHead({
-      n: 4,
+      n: 6,
       id: 'h-gemelo',
       title: 'Gemelo digital',
       desc: 'Réplica en vivo de la sala de migración. Cambia las ventanillas abiertas o la demanda y compara lo que predice el modelo con lo que ocurre en la simulación.',
@@ -127,8 +127,8 @@ export function renderTwin(el, P, opt, store) {
               <span class="inline-flex items-center gap-1.5"><span class="w-4 border-t border-dashed border-accent"></span><span>L<sub>q</sub> del modelo</span></span>
             </figcaption>
             <svg class="w-full h-20 rounded-lg bg-slate-50/60 border border-line" viewBox="0 0 300 80" preserveAspectRatio="none" data-spark aria-hidden="true">
-              <line data-spark-model x1="0" x2="300" stroke="#2f5bd3" stroke-dasharray="4 4" stroke-width="1" vector-effect="non-scaling-stroke" />
-              <polyline data-spark-line fill="none" stroke="#0f1b2d" stroke-width="1.5" vector-effect="non-scaling-stroke" />
+              <line data-spark-model x1="0" x2="300" class="stroke-accent" stroke-dasharray="4 4" stroke-width="1" vector-effect="non-scaling-stroke" />
+              <polyline data-spark-line fill="none" class="stroke-ink" stroke-width="1.5" vector-effect="non-scaling-stroke" />
             </svg>
           </figure>
         </div>

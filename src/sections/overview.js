@@ -1,3 +1,5 @@
+import hero600 from '../assets/hero-600.webp';
+import hero900 from '../assets/hero-900.webp';
 import { minutes, num, pct, seconds, usd, usdCompact } from '../lib/format.js';
 import { sectionHead, sub } from './common.js';
 
@@ -84,8 +86,8 @@ export function renderIntro(el, P, opt, sv) {
         </dl>
       </div>
       <div class="hidden lg:block lg:col-span-5 relative bg-slate-200">
-        <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=900&q=70"
-             alt="" loading="lazy" decoding="async" class="absolute inset-0 w-full h-full object-cover" onerror="this.remove()" />
+        <img src="${hero900}" srcset="${hero600} 600w, ${hero900} 900w" sizes="(min-width: 1024px) 440px, 0px"
+             width="900" height="598" alt="" decoding="async" fetchpriority="low" class="absolute inset-0 w-full h-full object-cover" />
       </div>
     </div>
 

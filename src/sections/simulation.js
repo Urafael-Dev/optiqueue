@@ -12,7 +12,7 @@ export function renderSimulation(el, P, opt) {
 
   el.innerHTML = `
     ${sectionHead({
-      n: 5,
+      n: 7,
       id: 'h-simulacion',
       title: 'Simulación de eventos discretos',
       desc: 'Llegadas de Poisson, servicio exponencial y atención por orden de llegada. Se descartan los primeros 15 minutos, cuando la sala arranca vacía.',
@@ -77,7 +77,7 @@ export function renderSimulation(el, P, opt) {
           <p class="label mb-2">Primeros pasajeros de la réplica 1</p>
           <div class="max-h-64 overflow-y-auto">
             <table class="table w-full text-xs">
-              <thead class="sticky top-0 bg-white"><tr><th scope="col">Llegada</th><th scope="col">Ventanilla</th><th scope="col">Espera</th></tr></thead>
+              <thead class="sticky top-0 bg-surface"><tr><th scope="col">Llegada</th><th scope="col">Ventanilla</th><th scope="col">Espera</th></tr></thead>
               <tbody>
                 ${r.log
                   .map(

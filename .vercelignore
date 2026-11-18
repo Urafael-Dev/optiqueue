@@ -6,3 +6,5 @@ tests
 __pycache__
 .venv
 .env*
+docs
+.github

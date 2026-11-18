@@ -1,0 +1,109 @@
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/jetbrains-mono";
+@import "katex/dist/katex.min.css";
+
+/* Informe imprimible: siempre en claro, tipografía de documento. */
+:root {
+  --ink: #0f172a;
+  --text: #334155;
+  --muted: #64748b;
+  --line: #dde3ea;
+  --soft: #f4f6f9;
+  --accent: #2f5bd3;
+  --accent-soft: #edf2fd;
+  --ok: #157f4b;
+  --bad: #c02626;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html { background: #e9edf2; }
+body.report-body { margin: 0; font-family: "Inter Variable", system-ui, sans-serif; color: var(--text); font-size: 10.5pt; line-height: 1.55; }
+
+.report-toolbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 1rem; padding: 0.7rem 1rem; background: #0f1b2d; color: #cbd5e1; font-size: 14px; }
+.report-tool-link { color: #cbd5e1; text-decoration: none; }
+.report-tool-link:hover { color: #fff; }
+.report-tool-hint { margin-left: auto; font-size: 13px; color: #94a3b8; }
+.report-tool-btn { border: 0; border-radius: 6px; background: #2f5bd3; color: #fff; padding: 0.5rem 0.9rem; font: 500 14px "Inter Variable", sans-serif; cursor: pointer; }
+.report-tool-btn:hover { background: #2549b3; }
+@media (max-width: 640px) { .report-tool-hint { display: none; } .report-tool-btn { margin-left: auto; } }
+
+.report-page { max-width: 210mm; margin: 1.5rem auto; padding: 18mm 18mm 20mm; background: #fff; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08), 0 8px 24px rgb(15 27 45 / 0.08); }
+@media (max-width: 760px) { .report-page { margin: 0; padding: 1.25rem 1rem 2rem; box-shadow: none; } }
+.report-loading { color: var(--muted); }
+
+/* Portada */
+.r-cover { border-bottom: 2px solid var(--ink); padding-bottom: 14pt; margin-bottom: 16pt; }
+.r-kicker { font-size: 9pt; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin: 0; }
+.r-title { font-size: 21pt; line-height: 1.2; color: var(--ink); margin: 6pt 0 4pt; font-weight: 650; letter-spacing: -0.01em; }
+.r-sub { margin: 0; color: var(--muted); }
+.r-meta { display: flex; flex-wrap: wrap; gap: 4pt 18pt; margin-top: 10pt; font-size: 9pt; color: var(--muted); }
+
+/* Resumen ejecutivo */
+.r-summary { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); border-radius: 6pt; margin: 12pt 0 4pt; }
+.r-summary > div { padding: 8pt 10pt; border-left: 1px solid var(--line); }
+.r-summary > div:first-child { border-left: 0; }
+.r-summary dt { font-size: 8pt; color: var(--muted); }
+.r-summary dd { margin: 2pt 0 0; font-size: 14pt; font-weight: 650; color: var(--ink); font-variant-numeric: tabular-nums; }
+.r-summary dd small { font-size: 8pt; font-weight: 400; color: var(--muted); display: block; }
+@media (max-width: 640px) { .r-summary { grid-template-columns: 1fr 1fr; } .r-summary > div:nth-child(3) { border-left: 0; } .r-summary > div:nth-child(n+3) { border-top: 1px solid var(--line); } }
+
+/* Secciones */
+.r-sec { margin-top: 18pt; }
+.r-sec h2 { font-size: 13.5pt; color: var(--ink); margin: 0 0 6pt; display: flex; gap: 8pt; align-items: baseline; font-weight: 650; }
+.r-sec h2 .n { font: 500 9.5pt "JetBrains Mono Variable", monospace; color: var(--accent); }
+.r-sec h3 { font-size: 11pt; color: var(--ink); margin: 12pt 0 4pt; font-weight: 600; }
+.r-sec p { margin: 4pt 0; }
+.r-note { font-size: 8.5pt; color: var(--muted); }
+.r-callout { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 7pt 10pt; margin: 8pt 0; border-radius: 0 4pt 4pt 0; }
+.r-callout strong { color: var(--ink); }
+.r-answer { border: 1px solid var(--line); border-radius: 6pt; padding: 9pt 12pt; margin: 8pt 0; }
+.r-answer .q { font-size: 9pt; color: var(--muted); margin: 0; }
+.r-answer .a { font-size: 12pt; font-weight: 650; color: var(--ink); margin: 3pt 0; }
+ul.r-list { margin: 4pt 0; padding-left: 14pt; }
+ul.r-list li { margin: 2pt 0; }
+
+/* Tablas */
+table.r-table { width: 100%; border-collapse: collapse; font-size: 9pt; margin: 6pt 0; font-variant-numeric: tabular-nums; }
+.r-table th { text-align: right; font-weight: 600; color: var(--muted); font-size: 8pt; padding: 4pt 6pt; border-bottom: 1px solid var(--ink); }
+.r-table td { text-align: right; padding: 3.5pt 6pt; border-bottom: 1px solid var(--line); }
+.r-table th:first-child, .r-table td:first-child { text-align: left; }
+.r-table tr.hl td { background: var(--accent-soft); font-weight: 600; color: var(--ink); }
+.r-table .bad { color: var(--bad); }
+.r-table .ok { color: var(--ok); }
+.r-scroll { overflow-x: auto; }
+
+/* Fórmulas */
+.r-steps { counter-reset: s; }
+.r-step { display: grid; grid-template-columns: 1fr 1fr; gap: 4pt 14pt; padding: 6pt 0; border-bottom: 1px solid var(--line); }
+.r-step:last-child { border-bottom: 0; }
+.r-step h4 { grid-column: 1 / -1; margin: 0; font-size: 9.5pt; color: var(--ink); font-weight: 600; }
+.r-step .katex-display { margin: 2pt 0; text-align: left; }
+.r-step .katex-display > .katex { text-align: left; }
+.r-step .katex { font-size: 1.02em; }
+.r-step .note { grid-column: 1 / -1; font-size: 8.5pt; color: var(--muted); margin: 0; }
+.r-model .katex-display { margin: 3pt 0; text-align: left; }
+.r-model .katex-display > .katex { text-align: left; }
+.r-model dt { font-size: 8pt; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-top: 6pt; }
+.r-model dd { margin: 0; }
+.fx-result { color: var(--accent); }
+@media (max-width: 640px) { .r-step { grid-template-columns: 1fr; } .r-step .katex-display { overflow-x: auto; overflow-y: hidden; } }
+
+figure.r-fig { margin: 8pt 0; }
+figure.r-fig img { width: 100%; height: auto; border: 1px solid var(--line); border-radius: 4pt; }
+figure.r-fig figcaption { font-size: 8.5pt; color: var(--muted); margin-top: 3pt; }
+
+pre.r-code { font: 7.6pt/1.45 "JetBrains Mono Variable", monospace; background: var(--soft); border: 1px solid var(--line); border-radius: 4pt; padding: 8pt 10pt; white-space: pre-wrap; word-break: break-word; color: var(--ink); }
+
+/* Impresión */
+@page { size: A4; margin: 15mm 14mm 16mm; }
+@media print {
+  html, body.report-body { background: #fff; }
+  .no-print { display: none !important; }
+  .report-page { max-width: none; margin: 0; padding: 0; box-shadow: none; }
+  .r-sec h2, .r-sec h3 { break-after: avoid; }
+  .r-step, .r-answer, figure.r-fig, .r-summary, .r-callout, table.r-table tr { break-inside: avoid; }
+  .r-break { break-before: page; }
+  a { color: inherit; text-decoration: none; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

@@ -12,7 +12,7 @@
 
     <!-- Apariencia e iconos -->
     <meta name="theme-color" content="#0f1b2d" />
-    <meta name="color-scheme" content="light" />
+    <meta name="color-scheme" content="light dark" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -91,6 +91,12 @@
       @media (prefers-reduced-motion: reduce) { #splash .sp-logo span, #splash .sp-track span { animation: none; } #splash { transition: none; } }
     </style>
     <script>
+      // Tema: preferencia guardada o la del sistema (antes de pintar, sin parpadeo)
+      (function () {
+        var t = null;
+        try { t = localStorage.getItem('theme'); } catch (e) {}
+        if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+      })();
       document.documentElement.classList.add('splash-lock');
       window.__splashStart = performance.now();
       // Respaldo: si algo falla al cargar, la pantalla de carga no se queda fija.
@@ -112,7 +118,7 @@
         <div class="sp-track" aria-hidden="true"><span></span></div>
       </div>
     </div>
-    <a href="#contenido" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:bg-white focus:px-3 focus:py-2 focus:rounded-md focus:border focus:border-line">Saltar al contenido</a>
+    <a href="#contenido" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:bg-surface focus:px-3 focus:py-2 focus:rounded-md focus:border focus:border-line">Saltar al contenido</a>
 
     <noscript>
       <div style="max-width: 46rem; margin: 2rem auto; padding: 1.5rem; font-family: system-ui, sans-serif; line-height: 1.6; background: #fff; border: 1px solid #e3e8ef; border-radius: 12px">
@@ -155,6 +161,8 @@
           <p class="nav-group">Análisis M/M/c</p>
           <a href="#grafico" class="nav-link" data-spy><i data-lucide="chart-line"></i>Costo vs. espera</a>
           <a href="#escenarios" class="nav-link" data-spy><i data-lucide="table"></i>Escenarios</a>
+          <a href="#sensibilidad" class="nav-link" data-spy><i data-lucide="split"></i>Sensibilidad</a>
+          <a href="#demanda" class="nav-link" data-spy><i data-lucide="clock"></i>Demanda por hora</a>
         </div>
         <div>
           <p class="nav-group">Simulación y modelo</p>
@@ -170,7 +178,7 @@
 
     <div class="lg:pl-64 min-h-screen flex flex-col">
       <!-- BARRA SUPERIOR -->
-      <header class="sticky top-0 z-20 h-16 bg-white border-b border-line flex items-center gap-3 px-4 sm:px-8">
+      <header class="sticky top-0 z-20 h-16 bg-surface border-b border-line flex items-center gap-3 px-4 sm:px-8">
         <button id="navOpen" type="button" class="lg:hidden p-1.5 -ml-1.5 rounded-md text-slate-600 hover:bg-slate-100 cursor-pointer" aria-label="Abrir menú" aria-controls="sidebar" aria-expanded="false">
           <i data-lucide="menu" class="w-5 h-5"></i>
         </button>
@@ -179,8 +187,10 @@
           <i data-lucide="chevron-right" class="hidden sm:inline w-3.5 h-3.5 text-slate-300"></i>
           <span class="font-medium text-ink truncate">Ejercicio 4 · Migración aeroportuaria</span>
         </nav>
-        <div class="ml-auto flex items-center gap-4">
+        <div class="ml-auto flex items-center gap-2 sm:gap-3">
           <span id="topSavings" class="hidden md:inline text-sm text-slate-500"></span>
+          <a href="./informe.html" class="btn" title="Informe imprimible / PDF"><i data-lucide="printer"></i><span class="hidden sm:inline">Informe PDF</span></a>
+          <button id="themeToggle" type="button" class="btn w-9 px-0" aria-label="Activar modo oscuro" title="Cambiar tema"><i data-lucide="moon"></i></button>
           <button type="button" class="btn" data-open="dlgEnunciado"><i data-lucide="file-text"></i><span class="hidden sm:inline">Enunciado</span></button>
         </div>
       </header>
@@ -191,6 +201,8 @@
           <section id="respuestas" class="sec" aria-labelledby="h-respuestas"></section>
           <section id="grafico" class="sec" aria-labelledby="h-grafico"></section>
           <section id="escenarios" class="sec" aria-labelledby="h-escenarios"></section>
+          <section id="sensibilidad" class="sec" aria-labelledby="h-sensibilidad"></section>
+          <section id="demanda" class="sec" aria-labelledby="h-demanda"></section>
           <section id="gemelo" class="sec" aria-labelledby="h-gemelo"></section>
           <section id="simulacion" class="sec" aria-labelledby="h-simulacion"></section>
           <section id="formulacion" class="sec" aria-labelledby="h-formulacion"></section>
@@ -198,7 +210,7 @@
         </div>
       </main>
 
-      <footer id="pie" class="mt-8 border-t border-line bg-white"></footer>
+      <footer id="pie" class="mt-8 border-t border-line bg-surface"></footer>
     </div>
 
     <dialog id="dlgEnunciado" class="modal max-w-3xl" aria-labelledby="dlgEnunciadoTitle">

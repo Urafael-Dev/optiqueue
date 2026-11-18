@@ -10,7 +10,7 @@ export function renderFormulation(el, P, opt) {
 
   el.innerHTML = `
     ${sectionHead({
-      n: 6,
+      n: 8,
       id: 'h-formulacion',
       title: 'Modelo matemático',
       desc: 'Fórmulas del sistema M/M/c y su valor para el número de ventanillas que elijas. Cada paso se revela al llegar a él.',

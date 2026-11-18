@@ -1,10 +1,10 @@
 import {
   createIcons, ArrowRight, ArrowUp, ChartLine, ChevronRight, CircleCheck, Code, Copy, Cpu, Download, FileText, LayoutDashboard, Menu, Pause, Play, RotateCcw, Sigma, ArrowLeft, Check,
-  SlidersHorizontal, Table, X,
+  SlidersHorizontal, Table, X, Split, Clock, Moon, Sun, Printer, BookOpen, ExternalLink,
 } from 'lucide';
 
 const ICONS = {
-  ArrowLeft, ArrowRight, ArrowUp, ChartLine, Check, ChevronRight, CircleCheck, Code, Copy, Cpu, Download, FileText, LayoutDashboard, Menu, Pause, Play, RotateCcw, Sigma, SlidersHorizontal, Table, X,
+  ArrowLeft, ArrowRight, ArrowUp, ChartLine, Check, ChevronRight, CircleCheck, Code, Copy, Cpu, Download, FileText, LayoutDashboard, Menu, Pause, Play, RotateCcw, Sigma, SlidersHorizontal, Table, X, Split, Clock, Moon, Sun, Printer, BookOpen, ExternalLink,
 };
 
 /** Reemplaza los <i data-lucide> pendientes por SVG. Llamar tras cada render. */
@@ -100,4 +100,37 @@ export async function copyWithFeedback(btn, text) {
     if (label) label.textContent = 'No se pudo copiar';
   }
   setTimeout(() => label && (label.textContent = original), 1600);
+}
+
+/** Interruptor claro/oscuro. Guarda la elección y avisa con el evento `themechange`. */
+export function setupTheme() {
+  const root = document.documentElement;
+  const btn = document.getElementById('themeToggle');
+  const meta = document.querySelector('meta[name="theme-color"]');
+  const sync = () => {
+    const dark = root.classList.contains('dark');
+    btn.innerHTML = `<i data-lucide="${dark ? 'sun' : 'moon'}"></i>`;
+    btn.setAttribute('aria-label', dark ? 'Activar modo claro' : 'Activar modo oscuro');
+    btn.setAttribute('aria-pressed', String(dark));
+    meta?.setAttribute('content', dark ? '#0a1322' : '#0f1b2d');
+    refreshIcons();
+  };
+  const apply = (dark, save) => {
+    root.classList.add('theme-anim');
+    root.classList.toggle('dark', dark);
+    if (save) {
+      try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch { /* sin almacenamiento */ }
+    }
+    sync();
+    document.dispatchEvent(new CustomEvent('themechange', { detail: { dark } }));
+    setTimeout(() => root.classList.remove('theme-anim'), 300);
+  };
+  btn.addEventListener('click', () => apply(!root.classList.contains('dark'), true));
+  // Si el usuario no eligió, seguir al sistema
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    let saved = null;
+    try { saved = localStorage.getItem('theme'); } catch { /* sin almacenamiento */ }
+    if (!saved) apply(e.matches, false);
+  });
+  sync();
 }

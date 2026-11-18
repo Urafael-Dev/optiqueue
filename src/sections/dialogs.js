@@ -14,7 +14,7 @@ export function renderEnunciado(el, P, opt, sv) {
 
   // Diagrama del sistema: llegadas → cola → ventanillas → salida
   const node = (title, value, hint) => `
-    <div class="flex-1 min-w-0 rounded-lg border border-line bg-white px-3 py-2.5 text-center">
+    <div class="flex-1 min-w-0 rounded-lg border border-line bg-surface px-3 py-2.5 text-center">
       <p class="text-xs text-slate-500">${title}</p>
       <p class="font-semibold text-ink num">${value}</p>
       <p class="text-[11px] text-slate-500">${hint}</p>
@@ -75,7 +75,7 @@ export function renderEnunciado(el, P, opt, sv) {
           ${data
             .map(
               ([sym, val, desc]) => `
-            <div class="bg-white px-4 py-3 flex items-baseline gap-3">
+            <div class="bg-surface px-4 py-3 flex items-baseline gap-3">
               <dt class="w-10 shrink-0 font-mono text-accent whitespace-nowrap">${sym}</dt>
               <dd class="min-w-0"><span class="font-medium text-ink num">${val}</span><span class="block text-xs text-slate-500">${desc}</span></dd>
             </div>`,

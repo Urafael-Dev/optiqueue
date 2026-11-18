@@ -5,7 +5,24 @@ import graficoPng from '../../python/salidas/grafico_analitico.png';
 
 Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Tooltip);
 
-const C = { total: '#2f5bd3', service: '#94a3b8', wait: '#c2410c', wq: '#15803d', sla: '#b91c1c', opt: 'rgba(47,91,211,0.07)', grid: '#eef1f5', text: '#64748b' };
+/** Colores leídos del tema activo (claro u oscuro). */
+const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const palette = () => {
+  const dark = document.documentElement.classList.contains('dark');
+  return {
+    total: cssVar('--color-accent') || '#2f5bd3',
+    service: dark ? '#7b8aa5' : '#94a3b8',
+    wait: dark ? '#fb923c' : '#c2410c',
+    wq: dark ? '#4ade80' : '#15803d',
+    sla: dark ? '#f87171' : '#b91c1c',
+    opt: dark ? 'rgba(107,143,240,0.13)' : 'rgba(47,91,211,0.07)',
+    grid: cssVar('--color-line') || '#eef1f5',
+    text: cssVar('--color-slate-500') || '#64748b',
+    axis: dark ? '#3a4a66' : '#cbd5e1',
+    bg: cssVar('--color-surface') || '#fff',
+  };
+};
+let C = palette();
 
 /** Fondo blanco (exportación PNG), franja del óptimo y línea del SLA. */
 const overlay = {
@@ -13,7 +30,7 @@ const overlay = {
   beforeDraw(chart, _a, o) {
     const { ctx, chartArea: a, scales } = chart;
     ctx.save();
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = C.bg;
     ctx.fillRect(0, 0, chart.width, chart.height);
     const i = chart.data.labels.indexOf(o.optLabel);
     if (i >= 0) {
@@ -48,6 +65,7 @@ const overlay = {
 };
 
 export function renderChart(el, P, opt) {
+  C = palette();
   const data = opt.feasible;
   const series = [
     { key: 'total', label: 'Costo total', axis: 'yCost', get: (s) => s.totalCost, fmt: (v) => `${usd(v)}/h`, width: 2.5, radius: 3 },
@@ -75,7 +93,7 @@ export function renderChart(el, P, opt) {
         ${series
           .map(
             (s, i) => `<button type="button" class="toggle" data-series="${i}" aria-pressed="true">
-              <span class="inline-block w-4 ${s.dash ? 'border-t-2 border-dashed' : 'h-0.5'}" style="${s.dash ? `border-color:${C[s.key]}` : `background:${C[s.key]}`}"></span>${s.label}</button>`,
+              <span class="inline-block w-4 ${s.dash ? 'border-t-2 border-dashed' : 'h-0.5'}" data-swatch="${s.key}" style="${s.dash ? `border-color:${C[s.key]}` : `background:${C[s.key]}`}"></span>${s.label}</button>`,
           )
           .join('')}
       </div>
@@ -84,7 +102,7 @@ export function renderChart(el, P, opt) {
       </div>
     </div>
     <figure class="panel overflow-hidden" data-pane="mpl" hidden>
-      <img src="${graficoPng}" width="2000" height="1100" loading="lazy" decoding="async" class="w-full h-auto bg-white"
+      <img src="${graficoPng}" width="2000" height="1100" loading="lazy" decoding="async" class="w-full h-auto bg-surface"
         alt="Gráfico generado con Matplotlib: costo total y tiempo de espera según el número de ventanillas, con el óptimo en ${opt.x} y el límite de ${num(P.wqMaxH * 60, 0)} minutos." />
       <figcaption class="flex flex-wrap items-center justify-between gap-2 border-t border-line px-4 sm:px-6 py-3 text-sm text-slate-500">
         <span>Imagen real generada por <code class="font-mono text-ink">python/grafico.py</code> con Matplotlib.</span>
@@ -135,7 +153,7 @@ export function renderChart(el, P, opt) {
       scales: {
         x: {
           grid: { display: false },
-          border: { color: '#cbd5e1' },
+          border: { color: C.axis },
           ticks: { color: C.text, font },
           title: { display: true, text: 'Ventanillas abiertas', color: C.text, font },
         },
@@ -167,6 +185,28 @@ export function renderChart(el, P, opt) {
       btn.setAttribute('aria-pressed', String(visible));
       chart.update();
     });
+  });
+
+  // Cambio de tema: recolorear sin recrear el gráfico
+  document.addEventListener('themechange', () => {
+    C = palette();
+    chart.data.datasets.forEach((ds, i) => {
+      ds.borderColor = C[series[i].key];
+      ds.backgroundColor = C[series[i].key];
+    });
+    const sc = chart.options.scales;
+    sc.x.border.color = C.axis;
+    for (const k of ['x', 'yCost', 'yTime']) {
+      sc[k].ticks.color = C.text;
+      if (sc[k].title) sc[k].title.color = C.text;
+    }
+    sc.yCost.grid.color = C.grid;
+    el.querySelectorAll('[data-swatch]').forEach((sw) => {
+      const c = C[sw.dataset.swatch];
+      if (sw.style.borderColor) sw.style.borderColor = c;
+      else sw.style.background = c;
+    });
+    chart.update('none');
   });
 
   let view = 'chart';

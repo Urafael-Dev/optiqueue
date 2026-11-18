@@ -99,7 +99,7 @@ export function renderWalkthrough(el, dialog, P, opt, sv) {
       const x1 = xs.at(-1);
       const active = k.k === b.c - 1 || k.k === b.c;
       return `<line x1="${px(x0)}" y1="${py(k.intercept + k.slope * x0)}" x2="${px(x1)}" y2="${py(k.intercept + k.slope * x1)}"
-        stroke="${active ? '#2f5bd3' : '#94a3b8'}" stroke-width="${active ? 1.5 : 1}" stroke-dasharray="${active ? '' : '3 3'}" opacity="${active ? 0.9 : 0.6}" />`;
+        class="${active ? 'stroke-accent' : 'stroke-slate-400'}" stroke-width="${active ? 1.5 : 1}" stroke-dasharray="${active ? '' : '3 3'}" opacity="${active ? 0.9 : 0.6}" />`;
     })
     .join('');
   const yTicks = [];
@@ -111,11 +111,11 @@ export function renderWalkthrough(el, dialog, P, opt, sv) {
     <figure class="rounded-lg border border-line p-3">
       <svg viewBox="0 0 ${W} ${H}" class="w-full h-auto" role="img" aria-label="Costo total por número de ventanillas con las rectas secantes; el punto más bajo es x = ${b.c}.">
         <defs><clipPath id="plot"><rect x="${pad.l}" y="${pad.t}" width="${W - pad.l - pad.r}" height="${H - pad.t - pad.b}" /></clipPath></defs>
-        ${yTicks.map((v) => `<line x1="${pad.l}" x2="${W - pad.r}" y1="${py(v)}" y2="${py(v)}" stroke="#eef1f5" /><text x="${pad.l - 6}" y="${py(v) + 4}" text-anchor="end" font-size="10" fill="#64748b">$${v}</text>`).join('')}
-        ${xs.map((x) => `<text x="${px(x)}" y="${H - 8}" text-anchor="middle" font-size="10" fill="#64748b">${x}</text>`).join('')}
+        ${yTicks.map((v) => `<line x1="${pad.l}" x2="${W - pad.r}" y1="${py(v)}" y2="${py(v)}" class="stroke-line" /><text x="${pad.l - 6}" y="${py(v) + 4}" text-anchor="end" font-size="10" class="fill-slate-500">$${v}</text>`).join('')}
+        ${xs.map((x) => `<text x="${px(x)}" y="${H - 8}" text-anchor="middle" font-size="10" class="fill-slate-500">${x}</text>`).join('')}
         <g clip-path="url(#plot)">${cutLines}</g>
-        ${feas.map((s) => `<circle cx="${px(s.c)}" cy="${py(s.totalCost)}" r="${s.c === b.c ? 5 : 3.5}" fill="${s.c === b.c ? '#2f5bd3' : '#0f1b2d'}" />`).join('')}
-        <text x="${px(b.c)}" y="${py(b.totalCost) + 18}" text-anchor="middle" font-size="11" font-weight="600" fill="#2f5bd3" stroke="#fff" stroke-width="4" paint-order="stroke">x* = ${b.c}</text>
+        ${feas.map((s) => `<circle cx="${px(s.c)}" cy="${py(s.totalCost)}" r="${s.c === b.c ? 5 : 3.5}" class="${s.c === b.c ? 'fill-accent' : 'fill-ink'}" />`).join('')}
+        <text x="${px(b.c)}" y="${py(b.totalCost) + 18}" text-anchor="middle" font-size="11" font-weight="600" class="fill-accent stroke-surface" stroke-width="4" paint-order="stroke">x* = ${b.c}</text>
       </svg>
       <figcaption class="mt-1 text-xs text-slate-500">Puntos: costo total real. Líneas: restricciones de PuLP; en azul, las dos que se cruzan en el óptimo.</figcaption>
     </figure>
@@ -170,7 +170,7 @@ export function renderWalkthrough(el, dialog, P, opt, sv) {
         ['Espera promedio', seconds(b.Wq)],
         ['Utilización', pct(b.rho)],
       ]
-        .map(([k, v]) => `<div class="bg-white p-4"><p class="label">${k}</p><p class="mt-1 text-xl font-semibold text-ink num">${v}</p></div>`)
+        .map(([k, v]) => `<div class="bg-surface p-4"><p class="label">${k}</p><p class="mt-1 text-xl font-semibold text-ink num">${v}</p></div>`)
         .join('')}
     </div>
     <p class="font-medium text-ink">Frente a las ${P.baseWindows} ventanillas actuales</p>
