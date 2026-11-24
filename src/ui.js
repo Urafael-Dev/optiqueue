@@ -2,12 +2,12 @@ import {
   createIcons, ArrowRight, ArrowUp, ChartLine, ChevronRight, CircleCheck, Code, Copy, Cpu, Download, FileText, LayoutDashboard, Menu, Pause, Play, RotateCcw, Sigma, ArrowLeft, Check,
   SlidersHorizontal, Table, X, Split, Clock, Moon, Sun, Printer, BookOpen, ExternalLink, FileDown, ChevronDown,
   DoorOpen, Wallet, Timer, PiggyBank, Sparkles, SendHorizontal, Trash2, Wrench, Bot, Square, TrendingUp, Maximize2, Minimize2, Plane, GitCompare, FlaskConical, Undo2,
-  Calculator, User, Users, SquareStack, Layers, Factory, Activity, ListOrdered, Infinity as InfinityIcon, ChartColumn, Trophy, TriangleAlert, CircleHelp, MessageSquareText,
+  Calculator, User, Users, SquareStack, Layers, Factory, Activity, ListOrdered, Infinity as InfinityIcon, ChartColumn, Trophy, TriangleAlert, CircleHelp, MessageSquareText, ClipboardPaste, ScanSearch, ListChecks, ShieldCheck, ArrowUpRight,
 } from 'lucide';
 
 const ICONS = {
   ArrowLeft, ArrowRight, ArrowUp, ChartLine, Check, ChevronRight, CircleCheck, Code, Copy, Cpu, Download, FileText, LayoutDashboard, Menu, Pause, Play, RotateCcw, Sigma, SlidersHorizontal, Table, X, Split, Clock, Moon, Sun, Printer, BookOpen, ExternalLink, FileDown, ChevronDown, DoorOpen, Wallet, Timer, PiggyBank, Sparkles, SendHorizontal, Trash2, Wrench, Bot, Square, TrendingUp, Maximize2, Minimize2, Plane, GitCompare, FlaskConical, Undo2,
-  Calculator, User, Users, SquareStack, Layers, Factory, Activity, ListOrdered, Infinity: InfinityIcon, ChartColumn, Trophy, TriangleAlert, CircleHelp, MessageSquareText,
+  Calculator, User, Users, SquareStack, Layers, Factory, Activity, ListOrdered, Infinity: InfinityIcon, ChartColumn, Trophy, TriangleAlert, CircleHelp, MessageSquareText, ClipboardPaste, ScanSearch, ListChecks, ShieldCheck, ArrowUpRight,
 };
 
 /** Reemplaza los <i data-lucide> pendientes por SVG. Llamar tras cada render. */
@@ -155,15 +155,35 @@ export function setupTheme() {
     meta?.setAttribute('content', dark ? '#0a1322' : '#0f1b2d');
     refreshIcons();
   };
-  const apply = (dark, save) => {
-    root.classList.add('theme-anim');
+  const switchTo = (dark, save) => {
     root.classList.toggle('dark', dark);
     if (save) {
       try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch { /* sin almacenamiento */ }
     }
     sync();
     document.dispatchEvent(new CustomEvent('themechange', { detail: { dark } }));
-    setTimeout(() => root.classList.remove('theme-anim'), 300);
+  };
+  /**
+   * Cambio de tema sin trabas: en lugar de animar el color de miles de elementos, el
+   * navegador toma una imagen de la página y solo anima esa imagen (View Transitions),
+   * revelando el tema nuevo en un círculo que crece desde el botón.
+   */
+  const apply = (dark, save) => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!document.startViewTransition || reduce) return switchTo(dark, save);
+    const r = btn.getBoundingClientRect();
+    const x = r.left + r.width / 2;
+    const y = r.top + r.height / 2;
+    const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    const t = document.startViewTransition(() => switchTo(dark, save));
+    t.ready
+      .then(() =>
+        root.animate(
+          { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+          { duration: 480, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', pseudoElement: '::view-transition-new(root)' },
+        ),
+      )
+      .catch(() => {});
   };
   btn.addEventListener('click', () => apply(!root.classList.contains('dark'), true));
   // Si el usuario no eligió, seguir al sistema

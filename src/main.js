@@ -164,6 +164,19 @@ setupScrollSpy();
 assistantAvailable().then((ok) => ok && renderAssistant());
 refreshIcons();
 
+// Rendimiento: con el alto real de cada sección ya medido, las que están fuera de pantalla dejan
+// de recalcularse (el cambio de tema pasa de recalcular toda la página a solo lo visible).
+function enableLazyRendering() {
+  const main = document.getElementById('contenido');
+  if (!main || !CSS.supports('content-visibility', 'auto')) return;
+  main.querySelectorAll('.sec').forEach((sec) => {
+    sec.style.containIntrinsicSize = `auto ${Math.round(sec.getBoundingClientRect().height)}px`;
+  });
+  main.classList.add('cv-ready');
+}
+const idle = window.requestIdleCallback ?? ((fn) => setTimeout(fn, 200));
+(document.fonts?.ready ?? Promise.resolve()).then(() => idle(enableLazyRendering, { timeout: 2500 }));
+
 // Pantalla de carga: se retira cuando la página ya está dibujada (mínimo breve para que no parpadee).
 const splash = $('splash');
 if (splash) {

@@ -25,11 +25,11 @@ const SUGGESTIONS = {
     ['plane', 'Muéstrame el gemelo digital con 13 ventanillas'],
   ],
   resolvedor: [
-    ['calculator', 'Llegan 12 clientes por hora a un cajero que atiende en 4 minutos. ¿Cuánto esperan?'],
-    ['factory', '8 máquinas fallan cada 10 h y un mecánico repara en 1 h. ¿Conviene un segundo mecánico si cuesta $15/h y cada máquina parada $50/h?'],
-    ['square-stack', 'Una peluquería tiene 3 sillas de espera: ¿cuántos clientes se pierden?'],
-    ['circle-help', '¿Cuál es la diferencia entre M/M/1, M/D/1 y M/G/1?'],
-    ['trophy', 'Encuentra cuántos servidores minimizan el costo del ejercicio cargado'],
+    ['calculator', 'Llegan 12 clientes por hora a un cajero que atiende en 4 minutos. ¿Cuánto esperan?', 'M/M/1'],
+    ['factory', '8 máquinas fallan cada 10 h y un mecánico repara en 1 h. ¿Conviene un segundo mecánico si cuesta $15/h y cada máquina parada $50/h?', 'Población finita'],
+    ['square-stack', 'Una peluquería tiene 3 sillas de espera: ¿cuántos clientes se pierden?', 'M/M/1/K'],
+    ['circle-help', '¿Cuál es la diferencia entre M/M/1, M/D/1 y M/G/1?', 'Conceptos'],
+    ['trophy', 'Encuentra cuántos servidores minimizan el costo del ejercicio cargado', 'Optimización'],
   ],
 };
 const TOOL_LABELS = {
@@ -641,9 +641,18 @@ function welcome() {
   if (embedded) {
     el.classList.add('as-welcome-compact');
     el.innerHTML = `
-      <p class="as-sugg-label">Ejemplos de enunciados</p>
+      <ol class="as-flow" aria-label="Cómo funciona">
+        ${[
+          ['clipboard-paste', 'Pega el enunciado', 'Tal como aparece en el libro o la guía, con sus unidades.'],
+          ['scan-search', 'Identifica el modelo', 'Reconoce el tipo de cola y convierte tiempos a tasas.'],
+          ['list-checks', 'Resultados en la página', 'Carga el ejercicio aquí, con desarrollo y explicación.'],
+        ]
+          .map(([icon, t, d], i) => `<li style="--i:${i}"><span class="as-flow-ico"><i data-lucide="${icon}"></i></span><span class="as-flow-n">${i + 1}</span><p class="as-flow-t">${t}</p><p class="as-flow-d">${d}</p></li>`)
+          .join('')}
+      </ol>
+      <div class="as-sugg-head"><p class="as-sugg-label">Prueba con un ejemplo</p><span class="as-sugg-hint">Haz clic para enviarlo</span></div>
       <div class="as-sugg">
-        ${SUGGESTIONS[page].map(([icon, q], i) => `<button type="button" class="as-suggest" data-as-suggest style="--i:${i}"><span class="as-suggest-ico"><i data-lucide="${icon}"></i></span><span data-q>${escapeHtml(q)}</span></button>`).join('')}
+        ${SUGGESTIONS[page].map(([icon, q, tag], i) => `<button type="button" class="as-suggest" data-as-suggest style="--i:${i}"><span class="as-suggest-top"><span class="as-suggest-ico"><i data-lucide="${icon}"></i></span>${tag ? `<span class="as-tag">${escapeHtml(tag)}</span>` : ''}<i data-lucide="arrow-up-right" class="as-suggest-go"></i></span><span data-q>${escapeHtml(q)}</span></button>`).join('')}
       </div>`;
     return el;
   }
@@ -699,10 +708,11 @@ export function renderAssistant({ page: pageName = 'principal', mount = null } =
     ? `<header class="as-head">
         <span class="as-avatar" aria-hidden="true"><i data-lucide="sparkles"></i></span>
         <div class="relative flex-1 min-w-0">
-          <p class="as-title">Resolver un enunciado con IA</p>
-          <p class="as-status"><span class="as-live-dot"></span><span data-as-status>Identifica el modelo, convierte las unidades y carga el ejercicio en esta página</span></p>
+          <p class="as-title">Asistente de modelado <span class="as-badge">IA</span></p>
+          <p class="as-status"><span data-as-status>Describe el sistema o pega el enunciado: identifico el modelo, convierto las unidades y cargo el ejercicio en el resolvedor.</span></p>
         </div>
-        <button type="button" class="as-icon-btn" data-as-reset aria-label="Nueva conversación" title="Nueva conversación"><i data-lucide="rotate-ccw"></i></button>
+        <span class="as-online max-sm:hidden"><span class="as-live-dot"></span>Disponible</span>
+        <button type="button" class="as-icon-btn as-reset-btn" data-as-reset aria-label="Nueva conversación" title="Nueva conversación"><i data-lucide="rotate-ccw"></i><span class="max-sm:hidden">Nueva</span></button>
       </header>`
     : `<header class="as-head">
         <span class="as-aurora as-aurora-1" aria-hidden="true"></span><span class="as-aurora as-aurora-2" aria-hidden="true"></span>
@@ -737,11 +747,23 @@ export function renderAssistant({ page: pageName = 'principal', mount = null } =
       ${head}
       <div class="as-log" data-as-log aria-live="polite"></div>
       <form class="as-form" data-as-form>
-        <div class="as-compose">
-          <textarea rows="${embedded ? 3 : 1}" class="as-input" data-as-input placeholder="${embedded ? 'Pega aquí el enunciado completo del ejercicio o haz una pregunta…' : 'Escribe tu pregunta…'}" aria-label="Tu pregunta" maxlength="4000"></textarea>
-          <button type="submit" class="as-send" data-as-send aria-label="Enviar pregunta"><i data-lucide="send-horizontal"></i>${embedded ? '<span class="as-send-label">Resolver</span>' : ''}</button>
+        ${
+          embedded
+            ? `<div class="as-compose">
+          <textarea rows="3" class="as-input" data-as-input placeholder="Ej.: A una farmacia llegan 18 clientes por hora y hay 2 farmacéuticos que atienden 12 clientes por hora cada uno. ¿Cuál es el tiempo promedio de espera?" aria-label="Enunciado o pregunta" maxlength="4000"></textarea>
+          <div class="as-toolbar">
+            <span class="as-kbd-hint"><kbd>Enter</kbd> enviar · <kbd>Shift</kbd> + <kbd>Enter</kbd> nueva línea</span>
+            <span class="as-count" data-as-count>0 / 4000</span>
+            <button type="submit" class="as-send" data-as-send aria-label="Enviar pregunta"><i data-lucide="send-horizontal"></i><span class="as-send-label">Resolver</span></button>
+          </div>
         </div>
-        <p class="as-foot">Enter para enviar · Shift + Enter para salto de línea · La IA puede equivocarse: verifica las cifras.</p>
+        <p class="as-foot"><i data-lucide="shield-check"></i>Los cálculos los hace el motor del resolvedor; la IA interpreta el enunciado y explica. Verifica siempre las cifras.</p>`
+            : `<div class="as-compose">
+          <textarea rows="1" class="as-input" data-as-input placeholder="Escribe tu pregunta…" aria-label="Tu pregunta" maxlength="4000"></textarea>
+          <button type="submit" class="as-send" data-as-send aria-label="Enviar pregunta"><i data-lucide="send-horizontal"></i></button>
+        </div>
+        <p class="as-foot">Enter para enviar · Shift + Enter para salto de línea · La IA puede equivocarse: verifica las cifras.</p>`
+        }
       </form>
     </section>`;
   (mount ?? document.body).appendChild(root);
@@ -786,7 +808,11 @@ export function renderAssistant({ page: pageName = 'principal', mount = null } =
     input.style.height = `${Math.min(input.scrollHeight, 140)}px`;
     root.querySelector('.as-compose').classList.toggle('has-text', !!input.value.trim());
   };
-  if (embedded) grow = () => root.querySelector('.as-compose').classList.toggle('has-text', !!input.value.trim());
+  if (embedded)
+    grow = () => {
+      root.querySelector('.as-compose').classList.toggle('has-text', !!input.value.trim());
+      root.querySelector('[data-as-count]').textContent = `${input.value.length.toLocaleString('es')} / 4000`;
+    };
   input.addEventListener('input', grow);
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
