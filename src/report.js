@@ -32,7 +32,7 @@ const fmtParam = (d, v, precise = false) => {
 // ---------- Contenido ----------
 const cover = `
   <header class="r-cover">
-    <p class="r-kicker">Investigación de Operaciones · Proyecto final · Ejercicio 4</p>
+    <p class="r-kicker">OptiQueue · Informe técnico · Caso de control migratorio</p>
     <h1 class="r-title">Optimización de colas en el control migratorio del aeropuerto</h1>
     <p class="r-sub">Teoría de colas M/M/c, programación entera y simulación de eventos discretos</p>
     <div class="r-meta"><span>Fecha: ${today}</span><span>Herramientas: Python (PuLP, SimPy, Matplotlib)</span><span>Versión web: optiqueue-roan.vercel.app</span></div>

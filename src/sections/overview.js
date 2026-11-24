@@ -6,7 +6,7 @@ import { refreshIcons } from '../ui.js';
 import { minutes, num, pct, seconds, usd, usdCompact } from '../lib/format.js';
 import { sectionHead, sub } from './common.js';
 
-export function renderParamsCard(el, P, opt) {
+export function renderParamsCard(el, P, opt, exploring = false) {
   const b = opt.best;
   const params = [
     ['λ', 'Llegadas', `${P.lambda}/h`],
@@ -19,8 +19,8 @@ export function renderParamsCard(el, P, opt) {
   el.innerHTML = `
     <div class="px-3.5 pt-3 pb-2.5 [@media(max-height:760px)]:hidden">
       <div class="flex items-center justify-between">
-        <p class="text-[11px] font-medium uppercase tracking-wider text-slate-500">Datos del ejercicio</p>
-        <button type="button" class="text-[11px] text-slate-400 hover:text-white cursor-pointer" data-open="dlgEnunciado">Enunciado</button>
+        <p class="text-[11px] font-medium uppercase tracking-wider ${exploring ? 'text-[#c4b5fd]' : 'text-slate-500'}">${exploring ? 'En exploración' : 'Datos del caso'}</p>
+        <button type="button" class="text-[11px] text-slate-400 hover:text-white cursor-pointer" data-open="dlgEnunciado">Caso</button>
       </div>
       <dl class="mt-2 space-y-1.5">
         ${params
@@ -66,17 +66,41 @@ export function renderIntro(el, P, opt, sv) {
     ['Costo de espera', `${usd(P.cw, 0)}/h por pasajero`],
     ['Nivel de servicio', `${sub('W', 'q')} ≤ ${num(P.wqMaxH * 60, 0)} min`],
   ];
+  // cada indicador con su color e icono
   const metrics = [
-    ['Ventanillas óptimas', `${b.c}`, `frente a ${P.baseWindows} actuales`],
-    ['Costo total', `${usd(b.totalCost)}<span class="text-base text-slate-400 font-normal">/h</span>`, `${usd(b.serviceCost, 0)} operación + ${usd(b.waitCost)} espera`],
-    ['Espera promedio', seconds(b.Wq, 1), `límite: ${num(P.wqMaxH * 60, 0)} min`],
-    ['Ahorro anual', usdCompact(sv.annual), `−${pct(sv.pctReported)} vs. costo reportado`],
+    ['Ventanillas óptimas', `${b.c}`, `frente a ${P.baseWindows} actuales`, 'door-open', '#2563eb'],
+    ['Costo total', `${usd(b.totalCost)}<span class="text-base text-slate-400 font-normal">/h</span>`, `${usd(b.serviceCost, 0)} operación + ${usd(b.waitCost)} espera`, 'wallet', '#7c3aed'],
+    ['Espera promedio', seconds(b.Wq, 1), `límite: ${num(P.wqMaxH * 60, 0)} min`, 'timer', '#0891b2'],
+    ['Ahorro anual', usdCompact(sv.annual), `−${pct(sv.pctReported)} vs. costo reportado`, 'piggy-bank', '#16a34a'],
   ];
+
+  const paramsHtml = params.map(([k, v]) => `<div class="kv"><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+  const metricsHtml = metrics
+    .map(
+      ([k, v, h, icon, c], i) => `
+        <div class="kpi" style="--c: ${c}; --i: ${i}">
+          <div class="flex items-start justify-between gap-2">
+            <dt class="label">${k}</dt>
+            <span class="kpi-icon"><i data-lucide="${icon}"></i></span>
+          </div>
+          <dd class="mt-1 text-2xl sm:text-[1.75rem] font-semibold text-ink num tracking-tight">${v}</dd>
+          <dd class="mt-1 text-xs text-slate-500">${h}</dd>
+        </div>`,
+    )
+    .join('');
+
+  // Al recalcular (modo exploración) solo se cambian los datos: el vídeo sigue intacto
+  if (el.querySelector('[data-intro-params]')) {
+    el.querySelector('[data-intro-params]').innerHTML = paramsHtml;
+    el.querySelector('[data-intro-metrics]').innerHTML = metricsHtml;
+    refreshIcons();
+    return;
+  }
 
   el.innerHTML = `
     <div class="panel overflow-hidden grid grid-cols-1 lg:grid-cols-12">
       <div class="lg:col-span-7 p-6 sm:p-8">
-        <p class="text-sm font-medium text-accent">Teoría de colas · Modelo M/M/c</p>
+        <p class="text-sm font-medium text-accent">Caso · Control migratorio</p>
         <h1 id="titulo-principal" class="mt-2 text-2xl sm:text-[2rem] font-semibold tracking-tight leading-tight text-balance">
           Optimización de colas en el control migratorio del aeropuerto
         </h1>
@@ -84,9 +108,7 @@ export function renderIntro(el, P, opt, sv) {
           ¿Cuántas ventanillas abrir en hora pico? Resolución analítica (Erlang C), simulación de eventos discretos y programación entera
           para minimizar el costo total sin superar ${num(P.wqMaxH * 60, 0)} minutos de espera promedio.
         </p>
-        <dl class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-8 text-sm max-w-xl">
-          ${params.map(([k, v]) => `<div class="kv"><dt>${k}</dt><dd>${v}</dd></div>`).join('')}
-        </dl>
+        <dl class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-8 text-sm max-w-xl" data-intro-params>${paramsHtml}</dl>
       </div>
       <div class="order-first lg:order-none lg:col-span-5 relative aspect-video sm:aspect-[21/9] lg:aspect-auto bg-slate-200 overflow-hidden">
         <video class="absolute inset-0 w-full h-full object-cover object-[70%_center]" muted loop playsinline preload="metadata"
@@ -100,18 +122,7 @@ export function renderIntro(el, P, opt, sv) {
       </div>
     </div>
 
-    <dl class="mt-4 panel grid grid-cols-2 lg:grid-cols-4 [&>div]:border-line">
-      ${metrics
-        .map(
-          ([k, v, h], i) => `
-        <div class="p-5 ${i % 2 ? 'border-l' : ''} ${i > 1 ? 'border-t lg:border-t-0' : ''} ${i === 2 ? 'lg:border-l' : ''}">
-          <dt class="label">${k}</dt>
-          <dd class="mt-1 text-2xl sm:text-[1.75rem] font-semibold text-ink num tracking-tight">${v}</dd>
-          <dd class="mt-1 text-xs text-slate-500">${h}</dd>
-        </div>`,
-        )
-        .join('')}
-    </dl>`;
+    <dl class="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" data-intro-metrics>${metricsHtml}</dl>`;
 
   setupHeroVideo(el);
 }
@@ -166,7 +177,7 @@ export function renderAnswers(el, P, opt, sv) {
 
   const block = (n, question, answer, rows, note) => `
     <article class="panel p-6 flex flex-col">
-      <p class="text-sm text-slate-500"><span class="font-mono text-slate-400 mr-1.5">P${n}</span>${question}</p>
+      <p class="text-sm text-slate-500"><span class="font-mono text-slate-400 mr-1.5">${n === 1 ? 'Decisión' : 'Impacto'}</span>${question}</p>
       <p class="mt-4 text-2xl font-semibold text-ink tracking-tight num">${answer}</p>
       <dl class="mt-4">${rows.map(([k, v]) => `<div class="kv"><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
       <p class="mt-4 text-sm text-slate-600">${note}</p>
@@ -176,7 +187,7 @@ export function renderAnswers(el, P, opt, sv) {
     ${sectionHead({
       n: 1,
       id: 'h-respuestas',
-      title: 'Respuestas',
+      title: 'Recomendación',
       actions: `<button type="button" class="link" data-action="open-opt">Ver resolución paso a paso<i data-lucide="arrow-right"></i></button>`,
     })}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -205,7 +216,7 @@ export function renderAnswers(el, P, opt, sv) {
       )}
     </div>
     <p class="text-sm text-slate-500 max-w-3xl">
-      <span class="text-ink font-medium">Nota.</span> El enunciado reporta ${usd(P.reportedBaseCost, 0)}/h para las ${P.baseWindows} ventanillas,
+      <span class="text-ink font-medium">Nota.</span> El cliente reporta ${usd(P.reportedBaseCost, 0)}/h para las ${P.baseWindows} ventanillas,
       pero el modelo M/M/c da ${usd(base.totalCost)}/h. El ahorro principal se mide contra la cifra reportada.
     </p>`;
 }

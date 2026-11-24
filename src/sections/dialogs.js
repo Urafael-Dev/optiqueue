@@ -1,7 +1,7 @@
 import { num, seconds, usd } from '../lib/format.js';
 import { sub } from './common.js';
 
-/** Enunciado del ejercicio: situación, datos, preguntas y entregables, con enlaces a cada respuesta. */
+/** Planteamiento del caso: situación, datos, preguntas de negocio y alcance del análisis. */
 export function renderEnunciado(el, P, opt, sv) {
   const b = opt.best;
   const slaMin = num(P.wqMaxH * 60, 0);
@@ -53,19 +53,19 @@ export function renderEnunciado(el, P, opt, sv) {
   ];
 
   const deliverables = [
-    ['Simular la cola con SimPy', '#simulacion', 'Simulación'],
-    ['Optimizar con PuLP', '#codigo', 'Código'],
-    [`Usar solo las variables <span class="font-mono text-ink">x</span> (ventanillas, entero) e <span class="font-mono text-ink">y</span> (costo resultante)`, '#formulacion', 'Modelo'],
-    ['Gráfico de tiempo de espera frente a costo total', '#grafico', 'Gráfico'],
+    ['Validación con simulación de eventos discretos', '#simulacion', 'Simulación'],
+    ['Optimización entera del número de ventanillas', '#codigo', 'Código'],
+    [`Modelo de decisión con <span class="font-mono text-ink">x</span> (ventanillas, entero) e <span class="font-mono text-ink">y</span> (costo resultante)`, '#formulacion', 'Modelo'],
+    ['Curva de tiempo de espera frente a costo total', '#grafico', 'Gráfico'],
   ];
 
   el.innerHTML = `
     <div class="px-4 sm:px-6 py-5 space-y-7 text-sm leading-relaxed max-h-[65vh] overflow-y-auto" data-scroll>
       ${block(
         'Situación',
-        `<p>En la zona de migración de un aeropuerto internacional se forman colas en hora pico. Hoy se abren
-        <strong class="text-ink">${P.baseWindows} ventanillas fijas</strong> durante todo el turno. Se quiere saber cuántas abrir para
-        <strong class="text-ink">gastar lo menos posible</strong> sin que la espera promedio supere <strong class="text-ink">${slaMin} minutos</strong>.</p>
+        `<p>En la zona de migración de un aeropuerto internacional se forman colas en hora pico. Hoy el cliente abre
+        <strong class="text-ink">${P.baseWindows} ventanillas fijas</strong> durante todo el turno y necesita saber cuántas abrir para
+        <strong class="text-ink">reducir el costo operativo</strong> sin que la espera promedio supere <strong class="text-ink">${slaMin} minutos</strong>.</p>
         ${diagram}`,
       )}
 
@@ -85,7 +85,7 @@ export function renderEnunciado(el, P, opt, sv) {
       )}
 
       ${block(
-        'Preguntas',
+        'Preguntas de negocio',
         `<ol class="space-y-3">
           ${questions
             .map(
@@ -96,7 +96,7 @@ export function renderEnunciado(el, P, opt, sv) {
                 <div class="min-w-0 space-y-2">
                   <p class="text-ink">${it.q}</p>
                   <p class="flex flex-wrap items-center gap-x-3 gap-y-1">
-                    <span class="text-slate-500">Respuesta: <span class="font-medium text-ink num">${it.a}</span></span>
+                    <span class="text-slate-500">Resultado: <span class="font-medium text-ink num">${it.a}</span></span>
                     <a href="#respuestas" class="link" data-close>Ver detalle<i data-lucide="arrow-right"></i></a>
                   </p>
                 </div>
@@ -108,7 +108,7 @@ export function renderEnunciado(el, P, opt, sv) {
       )}
 
       ${block(
-        'Requisitos en Python',
+        'Alcance del análisis',
         `<ul class="divide-y divide-line rounded-lg border border-line">
           ${deliverables
             .map(
@@ -121,7 +121,7 @@ export function renderEnunciado(el, P, opt, sv) {
             )
             .join('')}
         </ul>
-        <p class="text-xs text-slate-500">Todos los requisitos están cubiertos en el proyecto; cada enlace lleva a la sección correspondiente.</p>`,
+        <p class="text-xs text-slate-500">Cada punto del análisis tiene su sección en el panel; el enlace lleva directamente a ella.</p>`,
       )}
     </div>
     <div class="flex items-center justify-end gap-2 px-4 sm:px-6 py-3 border-t border-line">

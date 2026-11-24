@@ -1,7 +1,8 @@
 import { mmc } from '../lib/queue.js';
 import { num, pct, seconds, usd } from '../lib/format.js';
 import { SENS_PARAMS, optimalityRange, paramDef, solveWith, sweep, tornado } from '../lib/sensitivity.js';
-import { sectionHead } from './common.js';
+import { lifecycle, onAbort, sectionHead } from './common.js';
+import { provide } from '../lib/bridge.js';
 
 /** Valor de un parámetro con su unidad. `precise` añade decimales para los umbrales. */
 function fmtVal(def, v, precise = false) {
@@ -26,7 +27,7 @@ export function renderSensitivity(el, P, opt) {
       n: 4,
       id: 'h-sensibilidad',
       title: 'Análisis de sensibilidad',
-      desc: `¿Qué pasa si los datos del enunciado cambian? Mueve un parámetro y mira si ${x0} ventanillas siguen siendo la mejor opción.`,
+      desc: `¿Qué pasa si los datos del caso cambian? Mueve un parámetro y mira si ${x0} ventanillas siguen siendo la mejor opción.`,
     })}
 
     <div class="panel overflow-hidden">
@@ -153,7 +154,7 @@ export function renderSensitivity(el, P, opt) {
     const xTicks = Array.from({ length: nx }, (_, i) => def.min + ((def.max - def.min) * i) / (nx - 1));
     const base = def.get(P);
 
-    $('[data-chart]').setAttribute('aria-label', `Número óptimo de ventanillas según ${def.label.toLowerCase()}. Con el valor del enunciado (${fmtVal(def, base)}) el óptimo es ${x0}.`);
+    $('[data-chart]').setAttribute('aria-label', `Número óptimo de ventanillas según ${def.label.toLowerCase()}. Con el valor del escenario base (${fmtVal(def, base)}) el óptimo es ${x0}.`);
     $('[data-chart]').innerHTML = `
       <rect x="${sx(bandLo)}" y="${T}" width="${Math.max(1, sx(bandHi) - sx(bandLo))}" height="${H - T - B}" class="fill-accent-soft" />
       ${yTicks.map((y) => `
@@ -229,7 +230,7 @@ export function renderSensitivity(el, P, opt) {
     const lo = r.low.value === null ? null : fmtVal(def, r.low.value, true);
     const hi = r.high.value === null ? null : fmtVal(def, r.high.value, true);
     let txt = `<strong class="text-ink">x* = ${x0}</strong> se mantiene `;
-    if (lo && hi) txt += `con ${def.label.toLowerCase()} entre <strong class="text-ink">${lo}</strong> y <strong class="text-ink">${hi}</strong> (${relChange(r.low.value, r.base)} / ${relChange(r.high.value, r.base)} respecto al enunciado).`;
+    if (lo && hi) txt += `con ${def.label.toLowerCase()} entre <strong class="text-ink">${lo}</strong> y <strong class="text-ink">${hi}</strong> (${relChange(r.low.value, r.base)} / ${relChange(r.high.value, r.base)} respecto al escenario base).`;
     else if (lo) txt += `mientras ${def.label.toLowerCase()} sea mayor que <strong class="text-ink">${lo}</strong> (${relChange(r.low.value, r.base)}).`;
     else if (hi) txt += `mientras ${def.label.toLowerCase()} sea menor que <strong class="text-ink">${hi}</strong> (${relChange(r.high.value, r.base)}).`;
     else txt += 'en todo el rango estudiado.';
@@ -247,7 +248,7 @@ export function renderSensitivity(el, P, opt) {
     Object.assign(slider, { min: def.min, max: def.max, step: def.step });
     slider.value = String(value);
     $('[data-slider-label]').textContent = `${def.label} (${def.unit})`;
-    $('[data-reset]').textContent = `Enunciado · ${fmtVal(def, def.get(P))}`;
+    $('[data-reset]').textContent = `Base · ${fmtVal(def, def.get(P))}`;
     drawChart();
     rangeText();
     update();
@@ -265,14 +266,30 @@ export function renderSensitivity(el, P, opt) {
   });
 
   let lastW = 0;
-  new ResizeObserver(() => {
+  const ro = new ResizeObserver(() => {
     const w = Math.round($('[data-chart]').getBoundingClientRect().width);
     if (w && w !== lastW) {
       lastW = w;
       drawChart();
       placeMarker(value, solveWith(P, def, value).x);
     }
-  }).observe($('[data-chart]'));
+  });
+  ro.observe($('[data-chart]'));
+  onAbort(lifecycle(el), () => ro.disconnect());
 
   selectParam(def.key);
+
+  // El asistente puede elegir el parámetro y mover el deslizador
+  provide('sensibilidad', {
+    set({ parametro, valor }) {
+      selectParam(parametro);
+      if (Number.isFinite(valor)) {
+        value = Math.min(def.max, Math.max(def.min, valor));
+        slider.value = String(value);
+        update();
+      }
+      const s = solveWith(P, def, value);
+      return { parametro: def.label, valor: value, unidad: def.unit, ventanillas_optimas: s.x, optimo_base: x0 };
+    },
+  });
 }

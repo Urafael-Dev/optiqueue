@@ -2,6 +2,7 @@ import { mmc } from '../lib/queue.js';
 import { simulate } from '../lib/simulation.js';
 import { minutes, num, pct, seconds, usd } from '../lib/format.js';
 import { sectionHead, sub } from './common.js';
+import { provide } from '../lib/bridge.js';
 
 export function renderSimulation(el, P, opt) {
   const options = [];
@@ -36,6 +37,7 @@ export function renderSimulation(el, P, opt) {
 
   const form = el.querySelector('[data-form]');
   const results = el.querySelector('[data-results]');
+  let lastRun = null;
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -48,6 +50,7 @@ export function renderSimulation(el, P, opt) {
     const r = simulate({ ...P, c, hours, replications, seed });
     const theo = mmc(c, P);
     const covers = Math.abs(r.wq - theo.Wq) <= r.wqHalfWidth;
+    lastRun = { c, hours, replications, seed, r, theo, covers };
 
     const row = (k, sim, th) => `<tr><td class="!text-left text-slate-600">${k}</td><td class="text-ink font-medium">${sim}</td><td class="text-slate-500">${th}</td></tr>`;
 
@@ -90,5 +93,21 @@ export function renderSimulation(el, P, opt) {
           </div>
         </div>
       </div>`;
+  });
+
+  // El asistente puede ejecutar la simulación aquí mismo, a la vista del usuario
+  provide('simulacion', {
+    run({ ventanillas, horas = 4, replicas = 30, semilla = 2026 }) {
+      const sel = form.elements.c;
+      if (![...sel.options].some((o) => Number(o.value) === ventanillas)) sel.add(new Option(String(ventanillas), String(ventanillas)));
+      sel.value = String(ventanillas);
+      const nearest = (list, v) => list.reduce((a, b) => (Math.abs(b - v) < Math.abs(a - v) ? b : a));
+      form.elements.hours.value = String(nearest([1, 4, 8, 24], horas));
+      form.elements.replications.value = String(nearest([5, 10, 30], replicas));
+      form.elements.seed.value = String(Math.max(1, Math.floor(semilla)));
+      lastRun = null;
+      form.requestSubmit();
+      return lastRun;
+    },
   });
 }

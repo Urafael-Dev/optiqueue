@@ -1,5 +1,5 @@
 import { minutes, num, pct, usd } from '../lib/format.js';
-import { sectionHead } from './common.js';
+import { lifecycle, onAbort, sectionHead } from './common.js';
 
 function verdict(s, P, opt) {
   if (!s.stable) return ['Inestable', 'text-bad'];
@@ -86,6 +86,7 @@ export function renderScenarios(el, P, opt, store) {
     draw();
   });
 
-  store.subscribe(draw);
+  const signal = lifecycle(el);
+  onAbort(signal, store.subscribe(draw));
   draw();
 }

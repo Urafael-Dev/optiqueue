@@ -1,6 +1,6 @@
 import 'katex/dist/katex.min.css';
 import { tex, buildSteps, buildModelRows } from '../lib/formulas.js';
-import { sectionHead } from './common.js';
+import { lifecycle, onAbort, sectionHead } from './common.js';
 
 export function renderFormulation(el, P, opt) {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -117,4 +117,5 @@ export function renderFormulation(el, P, opt) {
     { threshold: 0.35, rootMargin: '0px 0px -10% 0px' },
   );
   targets.forEach((t) => io.observe(t));
+  onAbort(lifecycle(el), () => io.disconnect());
 }

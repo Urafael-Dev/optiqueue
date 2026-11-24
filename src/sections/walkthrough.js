@@ -1,6 +1,6 @@
 import { minutes, num, pct, seconds, usd, usdCompact } from '../lib/format.js';
 import { refreshIcons } from '../ui.js';
-import { sub } from './common.js';
+import { lifecycle, onAbort, sub } from './common.js';
 
 /**
  * Recorrido guiado de la resolución: un paso por pantalla, con una idea clave,
@@ -239,13 +239,16 @@ export function renderWalkthrough(el, dialog, P, opt, sv) {
   stepBtns.forEach((btn) => btn.addEventListener('click', () => go(Number(btn.dataset.go))));
   prev.addEventListener('click', () => go(current - 1));
   next.addEventListener('click', () => (current === steps.length - 1 ? dialog.close() : go(current + 1)));
+  const signal = lifecycle(el);
   dialog.addEventListener('keydown', (e) => {
     if (e.target.closest('input, select, textarea, summary')) return;
     if (e.key === 'ArrowRight') go(current + 1);
     if (e.key === 'ArrowLeft') go(current - 1);
-  });
+  }, { signal });
   // Cada vez que se abre, el recorrido empieza desde el principio
-  new MutationObserver(() => dialog.open && go(0)).observe(dialog, { attributes: true, attributeFilter: ['open'] });
+  const mo = new MutationObserver(() => dialog.open && go(0));
+  mo.observe(dialog, { attributes: true, attributeFilter: ['open'] });
+  onAbort(signal, () => mo.disconnect());
 
   go(0);
 }

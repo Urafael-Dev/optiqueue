@@ -1,5 +1,5 @@
 /**
- * Parámetros del Ejercicio 4 (enunciado del curso).
+ * Parámetros del caso de demostración: control migratorio de un aeropuerto.
  * Todo lo que muestra la página se calcula a partir de este objeto,
  * así las cifras de KPIs, tabla, gráfico y textos nunca se contradicen.
  */

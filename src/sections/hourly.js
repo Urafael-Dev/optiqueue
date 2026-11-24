@@ -1,6 +1,6 @@
 import { DEMAND_PROFILE, hourlyPlan } from '../lib/hourly.js';
 import { num, pct, seconds, usd, usdCompact } from '../lib/format.js';
-import { sectionHead } from './common.js';
+import { lifecycle, onAbort, sectionHead } from './common.js';
 
 const hh = (h) => `${String(h).padStart(2, '0')}:00`;
 
@@ -16,7 +16,7 @@ export function renderHourly(el, P, opt) {
       n: 5,
       id: 'h-demanda',
       title: 'Demanda por hora del día',
-      desc: `El enunciado usa λ = ${P.lambda} pas/h, que corresponde a la hora pico. Con un perfil de llegadas de 24 horas se calcula cuántas ventanillas abrir en cada franja y cuánto se ahorra frente a dejarlas fijas.`,
+      desc: `El caso usa λ = ${P.lambda} pas/h, que corresponde a la hora pico. Con un perfil de llegadas de 24 horas se calcula cuántas ventanillas abrir en cada franja y cuánto se ahorra frente a dejarlas fijas.`,
     })}
 
     <div class="panel overflow-hidden">
@@ -68,7 +68,7 @@ export function renderHourly(el, P, opt) {
     </div>
 
     <p class="text-xs text-slate-500">
-      Supuestos: el perfil de llegadas es ilustrativo (dos olas de vuelos, pico de ${P.lambda} pas/h igual al del enunciado) y cada hora se resuelve como un
+      Supuestos: el perfil de llegadas es ilustrativo (dos olas de vuelos, pico de ${P.lambda} pas/h igual al del caso) y cada hora se resuelve como un
       sistema M/M/c estacionario independiente (método SIPP). En la práctica las ventanillas se agrupan en turnos, por lo que el ahorro real sería algo menor.
     </p>`;
 
@@ -202,10 +202,12 @@ export function renderHourly(el, P, opt) {
   svg.addEventListener('pointerleave', (e) => e.pointerType === 'mouse' && setHover(null));
 
   let lastW = 0;
-  new ResizeObserver(() => {
+  const ro = new ResizeObserver(() => {
     const w = Math.round(svg.getBoundingClientRect().width);
     if (w && w !== lastW) { lastW = w; drawChart(); }
-  }).observe(svg);
+  });
+  ro.observe(svg);
+  onAbort(lifecycle(el), () => ro.disconnect());
 
   recompute();
 }

@@ -6,7 +6,7 @@ import notebookUrl from '../../python/OptiQueue.ipynb?url';
 import csvUrl from '../../python/salidas/resultados_mmc.csv?url';
 
 const SECTIONS = [
-  ['#respuestas', 'Respuestas'],
+  ['#respuestas', 'Recomendación'],
   ['#grafico', 'Costo vs. espera'],
   ['#escenarios', 'Escenarios'],
   ['#sensibilidad', 'Sensibilidad'],
@@ -44,11 +44,11 @@ export function renderFooter(el, opt) {
       <div class="col-span-2 lg:col-span-4 space-y-4">
         <a href="#inicio" class="inline-flex items-center gap-2.5">
           <img src="/favicon.svg" alt="" width="28" height="28" class="rounded-md" />
-          <span class="font-semibold text-ink">OptiQueue</span>
+          <span class="font-semibold text-ink">Opti<span class="text-accent">Queue</span></span>
         </a>
         <p class="text-sm text-slate-500 max-w-sm">
-          Proyecto final de Investigación de Operaciones. Ejercicio 4: cuántas ventanillas de migración abrir en hora pico
-          para minimizar el costo sin superar el límite de espera.
+          Software de optimización de colas: decide cuántos puntos de atención abrir para minimizar costos sin superar el
+          tiempo de espera objetivo. Este panel muestra el caso de control migratorio de un aeropuerto.
         </p>
         <p class="inline-flex items-center gap-2 rounded-md border border-line bg-slate-50 px-3 py-1.5 text-sm">
           <span class="text-slate-500">Resultado:</span>
@@ -58,7 +58,7 @@ export function renderFooter(el, opt) {
 
       <div class="lg:col-span-2">
         ${col(
-          'Secciones',
+          'Panel',
           `<ul class="space-y-2 text-sm">
             ${SECTIONS.map(([href, label]) => `<li><a href="${href}" class="text-slate-600 hover:text-ink">${label}</a></li>`).join('')}
           </ul>`,
@@ -69,11 +69,12 @@ export function renderFooter(el, opt) {
         ${col(
           'Recursos',
           `<ul class="space-y-2 text-sm">
-            <li><button type="button" class="text-left text-slate-600 hover:text-ink cursor-pointer" data-open="dlgEnunciado">Enunciado del ejercicio</button></li>
+            <li><button type="button" class="text-left text-slate-600 hover:text-ink cursor-pointer" data-open="dlgEnunciado">Planteamiento del caso</button></li>
             <li><button type="button" class="text-left text-slate-600 hover:text-ink cursor-pointer" data-action="open-opt">Resolución paso a paso</button></li>
-            <li><a href="./descargas/OptiQueue_Informe_Final.docx" download class="text-slate-600 hover:text-ink">Informe final (Word)</a></li>
-            <li><a href="./descargas/OptiQueue_Informe_Final.pdf" download class="text-slate-600 hover:text-ink">Informe final (PDF)</a></li>
+            <li><a href="./descargas/OptiQueue_Informe_Final.docx" download class="text-slate-600 hover:text-ink">Informe técnico (Word)</a></li>
+            <li><a href="./descargas/OptiQueue_Informe_Final.pdf" download class="text-slate-600 hover:text-ink">Informe técnico (PDF)</a></li>
             <li><a href="./informe.html" class="text-slate-600 hover:text-ink">Resumen imprimible</a></li>
+            <li><a href="/resolver.html" class="text-slate-600 hover:text-ink">Resolvedor de colas</a></li>
           </ul>
           <p class="mt-5 text-xs text-slate-500">Descargar código</p>
           <ul class="mt-2 space-y-1.5 text-sm">
@@ -100,7 +101,7 @@ export function renderFooter(el, opt) {
 
     <div class="border-t border-line">
       <div class="max-w-6xl mx-auto px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-500">
-        <p>Todas las cifras se calculan en el navegador a partir de los parámetros del enunciado. Hecho con Vite, Chart.js y KaTeX.</p>
+        <p>© ${new Date().getFullYear()} OptiQueue. Todas las cifras se calculan en el navegador a partir de los datos del caso.</p>
         <button type="button" class="inline-flex items-center gap-1.5 self-start sm:self-auto text-slate-600 hover:text-ink cursor-pointer" data-top>
           Volver arriba<i data-lucide="arrow-up" class="w-3.5 h-3.5"></i>
         </button>

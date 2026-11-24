@@ -1,6 +1,6 @@
 import { CategoryScale, Chart, LinearScale, LineController, LineElement, PointElement, Tooltip } from 'chart.js';
 import { minutes, num, usd } from '../lib/format.js';
-import { sectionHead } from './common.js';
+import { lifecycle, onAbort, sectionHead } from './common.js';
 import graficoPng from '../../python/salidas/grafico_analitico.png';
 
 Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Tooltip);
@@ -65,6 +65,7 @@ const overlay = {
 };
 
 export function renderChart(el, P, opt) {
+  const signal = lifecycle(el);
   C = palette();
   const data = opt.feasible;
   const series = [
@@ -187,6 +188,8 @@ export function renderChart(el, P, opt) {
     });
   });
 
+  onAbort(signal, () => chart.destroy());
+
   // Cambio de tema: recolorear sin recrear el gráfico
   document.addEventListener('themechange', () => {
     C = palette();
@@ -207,7 +210,7 @@ export function renderChart(el, P, opt) {
       else sw.style.background = c;
     });
     chart.update('none');
-  });
+  }, { signal });
 
   let view = 'chart';
   el.querySelectorAll('[data-view]').forEach((btn) =>

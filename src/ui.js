@@ -1,10 +1,13 @@
 import {
   createIcons, ArrowRight, ArrowUp, ChartLine, ChevronRight, CircleCheck, Code, Copy, Cpu, Download, FileText, LayoutDashboard, Menu, Pause, Play, RotateCcw, Sigma, ArrowLeft, Check,
   SlidersHorizontal, Table, X, Split, Clock, Moon, Sun, Printer, BookOpen, ExternalLink, FileDown, ChevronDown,
+  DoorOpen, Wallet, Timer, PiggyBank, Sparkles, SendHorizontal, Trash2, Wrench, Bot, Square, TrendingUp, Maximize2, Minimize2, Plane, GitCompare, FlaskConical, Undo2,
+  Calculator, User, Users, SquareStack, Layers, Factory, Activity, ListOrdered, Infinity as InfinityIcon, ChartColumn, Trophy, TriangleAlert, CircleHelp, MessageSquareText,
 } from 'lucide';
 
 const ICONS = {
-  ArrowLeft, ArrowRight, ArrowUp, ChartLine, Check, ChevronRight, CircleCheck, Code, Copy, Cpu, Download, FileText, LayoutDashboard, Menu, Pause, Play, RotateCcw, Sigma, SlidersHorizontal, Table, X, Split, Clock, Moon, Sun, Printer, BookOpen, ExternalLink, FileDown, ChevronDown,
+  ArrowLeft, ArrowRight, ArrowUp, ChartLine, Check, ChevronRight, CircleCheck, Code, Copy, Cpu, Download, FileText, LayoutDashboard, Menu, Pause, Play, RotateCcw, Sigma, SlidersHorizontal, Table, X, Split, Clock, Moon, Sun, Printer, BookOpen, ExternalLink, FileDown, ChevronDown, DoorOpen, Wallet, Timer, PiggyBank, Sparkles, SendHorizontal, Trash2, Wrench, Bot, Square, TrendingUp, Maximize2, Minimize2, Plane, GitCompare, FlaskConical, Undo2,
+  Calculator, User, Users, SquareStack, Layers, Factory, Activity, ListOrdered, Infinity: InfinityIcon, ChartColumn, Trophy, TriangleAlert, CircleHelp, MessageSquareText,
 };
 
 /** Reemplaza los <i data-lucide> pendientes por SVG. Llamar tras cada render. */
@@ -18,7 +21,9 @@ export function setupSidebar() {
   const mq = window.matchMedia('(min-width: 1024px)');
 
   const setOpen = (open) => {
+    if (open && !sidebar.classList.contains('-translate-x-full')) return;
     sidebar.classList.toggle('-translate-x-full', !open);
+    if (open) playNavIntro();
     overlay.classList.toggle('hidden', !open);
     openBtn.setAttribute('aria-expanded', String(open));
     document.body.classList.toggle('overflow-hidden', open && !mq.matches);
@@ -60,7 +65,23 @@ export function setupDialogs() {
   });
 }
 
-/** Resalta en la barra superior la sección visible y la mantiene a la vista en móvil. */
+/** Entrada escalonada de los enlaces de la barra lateral (al cargar y al abrir el menú). */
+let introTimer = 0;
+export function playNavIntro() {
+  const nav = document.getElementById('sideNav');
+  if (!nav) return;
+  [...nav.querySelectorAll('.nav-group, .nav-link')].forEach((el, i) => el.style.setProperty('--i', i));
+  // las piezas de cada icono se normalizan a largo 1 para poder animarlas «dibujándose»
+  nav.querySelectorAll('svg :is(path, circle, rect, line, polyline)').forEach((el) => el.setAttribute('pathLength', '1'));
+  nav.classList.remove('nav-anim');
+  void nav.offsetWidth; // reinicia la animación
+  nav.classList.add('nav-anim');
+  // al terminar se quita la clase para que los efectos al pasar el cursor vuelvan a funcionar
+  clearTimeout(introTimer);
+  introTimer = setTimeout(() => nav.classList.remove('nav-anim'), 1400);
+}
+
+/** Resalta en la barra lateral la sección visible con un fondo que se desliza hasta ella. */
 export function setupScrollSpy() {
   const links = [...document.querySelectorAll('[data-spy]')];
   const sections = links.map((l) => document.getElementById(l.getAttribute('href').slice(1)));
@@ -79,7 +100,26 @@ export function setupScrollSpy() {
     current?.removeAttribute('aria-current');
     current = link;
     link?.setAttribute('aria-current', 'true');
+    moveIndicator();
   };
+  const indicator = document.getElementById('navIndicator');
+  const moveIndicator = () => {
+    if (!indicator) return;
+    if (!current) {
+      indicator.style.opacity = '0';
+      return;
+    }
+    indicator.style.opacity = '1';
+    indicator.style.height = `${current.offsetHeight}px`;
+    indicator.style.transform = `translateY(${current.offsetTop}px)`;
+    indicator.style.setProperty('--c', getComputedStyle(current).getPropertyValue('--c'));
+    // en móvil o pantallas bajas, mantiene visible el enlace activo
+    const nav = indicator.parentElement;
+    if (current.offsetTop < nav.scrollTop || current.offsetTop + current.offsetHeight > nav.scrollTop + nav.clientHeight) {
+      nav.scrollTo({ top: current.offsetTop - nav.clientHeight / 2, behavior: 'smooth' });
+    }
+  };
+  window.addEventListener('resize', moveIndicator);
   const onScroll = () => {
     if (!queued) requestAnimationFrame(update);
     queued = true;

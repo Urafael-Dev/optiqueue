@@ -9,7 +9,7 @@
   --muted: #64748b;
   --line: #dde3ea;
   --soft: #f4f6f9;
-  --accent: #2f5bd3;
+  --accent: #2563eb;
   --accent-soft: #edf2fd;
   --ok: #157f4b;
   --bad: #c02626;
@@ -24,7 +24,7 @@ body.report-body { margin: 0; font-family: "Inter Variable", system-ui, sans-ser
 .report-tool-link { color: #cbd5e1; text-decoration: none; }
 .report-tool-link:hover { color: #fff; }
 .report-tool-hint { margin-left: auto; font-size: 13px; color: #94a3b8; }
-.report-tool-btn { border: 0; border-radius: 6px; background: #2f5bd3; color: #fff; padding: 0.5rem 0.9rem; font: 500 14px "Inter Variable", sans-serif; cursor: pointer; }
+.report-tool-btn { border: 0; border-radius: 6px; background: #2563eb; color: #fff; padding: 0.5rem 0.9rem; font: 500 14px "Inter Variable", sans-serif; cursor: pointer; }
 .report-tool-btn:hover { background: #2549b3; }
 @media (max-width: 640px) { .report-tool-hint { display: none; } .report-tool-btn { margin-left: auto; } }
 
